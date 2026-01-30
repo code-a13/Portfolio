@@ -89,22 +89,23 @@ const Layout = () => {
         </div>
 
         {/* CHANGE 2: Scrollable Content - Added 'pb-24' for mobile space */}
-        <div className="flex-1 w-full h-full overflow-y-auto overflow-x-hidden scroll-smooth pb-24 md:pb-0">
-           <div className="min-h-full w-full max-w-7xl mx-auto p-6 md:p-16 flex items-center justify-center">
-             <AnimatePresence mode="wait">
-               <motion.div
-                 key={location.pathname}
-                 initial={{ opacity: 0, scale: 0.98, filter: "blur(10px)" }}
-                 animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-                 exit={{ opacity: 0, scale: 1.02, filter: "blur(10px)" }}
-                 transition={{ duration: 0.5, ease: "easeOut" }}
-                 className="w-full"
-               >
-                  <Outlet /> 
-               </motion.div>
-             </AnimatePresence>
-           </div>
-        </div>
+
+<div className="flex-1 w-full h-full overflow-y-auto overflow-x-hidden pt-24 md:pt-0">
+   <div className="min-h-full w-full max-w-7xl mx-auto p-6 md:p-16 flex items-center justify-center">
+     <AnimatePresence mode="wait">
+       <motion.div
+         key={location.pathname}
+         initial={{ opacity: 0, scale: 0.98, filter: "blur(10px)" }}
+         animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+         exit={{ opacity: 0, scale: 1.02, filter: "blur(10px)" }}
+         transition={{ duration: 0.5, ease: "easeOut" }}
+         className="w-full"
+       >
+          <Outlet /> 
+       </motion.div>
+     </AnimatePresence>
+   </div>
+</div>
 
       </div>
     </div>
