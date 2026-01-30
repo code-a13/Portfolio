@@ -9,7 +9,7 @@ const ITEM_HEIGHT = 80;
 const PADDING_TOP = "calc(50vh - 40px)"; 
 
 export const navItems = [
-  { id: "home", path: "/", name: "ADITYA",Qb: "ZR CREATIONS", icon: <Terminal size={24}/> },
+  { id: "home", path: "/", name: "ADITYA", tagline: "Software Developer", icon: <Terminal size={24}/> },
   { id: "projects", path: "/projects", name: "WORK", tagline: "BUILDS", icon: <Briefcase size={24}/> },
   { id: "achievements", path: "/achievements", name: "AWARDS", tagline: "TROPHIES", icon: <Award size={24}/> },
   { id: "about", path: "/about", name: "ABOUT", tagline: "BIO", icon: <User size={24}/> },
@@ -41,13 +41,14 @@ const Layout = () => {
   };
 
   return (
-    <div className="flex h-screen w-screen bg-dark text-white overflow-hidden font-sans selection:bg-accent selection:text-black">
+    // CHANGE 1: Used 'fixed inset-0' and 'h-[100dvh]' to lock screen
+    <div className="fixed inset-0 flex h-[100dvh] w-screen bg-dark text-white overflow-hidden font-sans selection:bg-accent selection:text-black">
       
       {/* --- AMBIENT BACKGROUND GLOWS --- */}
       <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
           <div className="absolute top-0 left-1/4 w-96 h-96 bg-purple-600/20 rounded-full blur-[100px] animate-blob"></div>
           <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-cyan-600/10 rounded-full blur-[100px] animate-blob animation-delay-2000"></div>
-          <div className="absolute top-1/2 left-1/2 w-80 h-80 bg-blue-600/10 rounded-fullSH blur-[120px] animate-blob animation-delay-4000"></div>
+          <div className="absolute top-1/2 left-1/2 w-80 h-80 bg-blue-600/10 rounded-full blur-[120px] animate-blob animation-delay-4000"></div>
       </div>
 
       {/* Noise Texture */}
@@ -67,7 +68,7 @@ const Layout = () => {
       {/* --- CONTENT AREA --- */}
       <div className="flex-1 h-full relative flex flex-col z-10 overflow-hidden">
         
-        {/* Background Big Text (Subtle Watermark) */}
+        {/* Background Big Text */}
         <div className="absolute right-[-5%] bottom-[-5%] select-none pointer-events-none opacity-[0.03] overflow-hidden">
             <motion.h1 
                 key={activeIndex}
@@ -87,8 +88,8 @@ const Layout = () => {
            </span>
         </div>
 
-        {/* Scrollable Content */}
-        <div className="flex-1 w-full h-full overflow-y-auto overflow-x-hidden">
+        {/* CHANGE 2: Scrollable Content - Added 'pb-24' for mobile space */}
+        <div className="flex-1 w-full h-full overflow-y-auto overflow-x-hidden scroll-smooth pb-24 md:pb-0">
            <div className="min-h-full w-full max-w-7xl mx-auto p-6 md:p-16 flex items-center justify-center">
              <AnimatePresence mode="wait">
                <motion.div
