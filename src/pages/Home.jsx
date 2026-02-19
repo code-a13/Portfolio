@@ -5,7 +5,7 @@ import {
   Briefcase, 
   User, 
   Mail, 
-  Award // New Icon for Achievements
+  Award 
 } from "lucide-react";
 
 // Import Components
@@ -22,8 +22,6 @@ import {
 const ITEM_HEIGHT = 100;
 const PADDING_TOP = "calc(50vh - 50px)"; 
 
-// --- DATA MAPPING ---
-// Connects the ID to the Icon and the Component
 const items = [
   { id: "home", name: "HOME", tagline: "SYSTEMS ONLINE", icon: <HomeIcon size={28}/>, component: <HeroSection /> },
   { id: "projects", name: "PROJECTS", tagline: "RECENT MISSIONS", icon: <Briefcase size={28}/>, component: <ProjectsSection /> },
@@ -43,16 +41,17 @@ const Home = () => {
     const targetIndex = Math.max(0, Math.min(items.length - 1, approximateIndex));
     const targetY = -(targetIndex * ITEM_HEIGHT);
     
-    animate(y, targetY, { type: "spring", stiffness: 400, damping: 30 });
+    // Smooth, premium spring physics
+    animate(y, targetY, { type: "spring", stiffness: 300, damping: 30 });
     setActiveIndex(targetIndex);
   };
 
   return (
-    <div className="relative w-full h-screen bg-[#050505] text-white overflow-hidden font-space flex selection:bg-red-500 selection:text-white">
+    // Advanced B&W Selection colors
+    <div className="relative w-full h-screen bg-black text-white overflow-hidden font-sans flex selection:bg-white selection:text-black">
       
-      {/* Background FX */}
-      <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none"></div>
+      {/* Background FX - Minimalist Grid */}
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:50px_50px] pointer-events-none z-0"></div>
 
       {/* --- SIDEBAR COMPONENT --- */}
       <Sidebar 
@@ -64,32 +63,33 @@ const Home = () => {
       />
 
       {/* --- RIGHT SIDE: DYNAMIC CONTENT --- */}
-      <div className="flex-1 h-full relative flex flex-col justify-center px-8 md:px-24">
+      <div className="flex-1 h-full relative flex flex-col justify-center px-8 md:px-16 lg:px-24 z-10">
         
-        {/* Background Giant Text */}
-        <div className="absolute right-0 bottom-0 select-none pointer-events-none overflow-hidden">
+        {/* Background Giant Text - Lowered opacity for cleaner look */}
+        <div className="absolute right-0 bottom-0 select-none pointer-events-none overflow-hidden z-0">
             <motion.h1 
                 key={activeIndex}
                 initial={{ x: 100, opacity: 0 }}
-                animate={{ x: 0, opacity: 0.05 }}
-                className="text-[15vw] font-black text-white leading-none whitespace-nowrap"
+                animate={{ x: 0, opacity: 0.02 }}
+                className="text-[15vw] font-black text-white leading-none whitespace-nowrap tracking-tighter"
             >
                 {items[activeIndex].name}
             </motion.h1>
         </div>
 
         {/* Content Container */}
-        <div className="relative z-10 w-full max-w-4xl">
+        <div className="relative z-20 w-full max-w-5xl">
            
-           {/* Section Label */}
+           {/* Minimalist Section Label */}
            <motion.div 
              key={`tag-${activeIndex}`}
              initial={{ opacity: 0, y: -10 }}
              animate={{ opacity: 1, y: 0 }}
-             className="flex items-center gap-4 mb-6"
+             transition={{ duration: 0.8, ease: "easeOut" }}
+             className="flex items-center gap-4 mb-8"
             >
-              <div className="w-10 h-[1px] bg-red-500"></div>
-              <span className="text-red-500 font-mono text-sm tracking-[0.3em] uppercase">
+              <div className="w-12 h-[1px] bg-white/30"></div>
+              <span className="text-neutral-400 font-mono text-xs tracking-[0.3em] uppercase font-medium">
                 {items[activeIndex].tagline}
               </span>
            </motion.div>
@@ -98,20 +98,20 @@ const Home = () => {
            <AnimatePresence mode="wait">
              <motion.div
                key={activeIndex}
-               initial={{ opacity: 0, x: 20, filter: "blur(5px)" }}
+               initial={{ opacity: 0, x: 20, filter: "blur(10px)" }}
                animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
-               exit={{ opacity: 0, x: -20, filter: "blur(5px)" }}
-               transition={{ duration: 0.4, ease: "easeOut" }}
+               exit={{ opacity: 0, x: -20, filter: "blur(10px)" }}
+               transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
              >
                 {items[activeIndex].component}
              </motion.div>
            </AnimatePresence>
         </div>
 
-        {/* Footer Info */}
-        <div className="absolute bottom-10 right-10 flex gap-6 text-[10px] text-gray-600 font-mono tracking-widest">
-            <span>SCROLL_Y: {Math.round(y.get())}</span>
-            <span>CPU: OPTIMAL</span>
+        {/* Footer Info - Subdued B&W styling */}
+        <div className="absolute bottom-10 right-10 flex gap-6 text-[10px] text-neutral-600 font-mono tracking-widest z-20 uppercase">
+            <span>Scroll_Y: {Math.round(y.get())}</span>
+            <span>CPU: Optimal</span>
         </div>
       </div>
     </div>

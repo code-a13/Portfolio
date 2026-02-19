@@ -22,6 +22,7 @@ const Layout = () => {
   const y = useMotionValue(0);
   const [activeIndex, setActiveIndex] = useState(0);
 
+  // Sync sidebar active index with the current URL route
   useEffect(() => {
     const currentIndex = navItems.findIndex(item => item.path === location.pathname);
     if (currentIndex !== -1) {
@@ -30,32 +31,34 @@ const Layout = () => {
     }
   }, [location.pathname, y]);
 
+  // Handle Dragging physics on the Sidebar
   const handleDragEnd = (event, info) => {
     const currentY = y.get();
     const approximateIndex = Math.round(-currentY / ITEM_HEIGHT);
     const targetIndex = Math.max(0, Math.min(navItems.length - 1, approximateIndex));
     const targetY = -(targetIndex * ITEM_HEIGHT);
+    
     animate(y, targetY, { type: "spring", stiffness: 400, damping: 30 });
     const targetPath = navItems[targetIndex].path;
     if (location.pathname !== targetPath) navigate(targetPath);
   };
 
   return (
-    // CHANGE 1: Used 'fixed inset-0' and 'h-[100dvh]' to lock screen
-    <div className="fixed inset-0 flex h-[100dvh] w-screen bg-dark text-white overflow-hidden font-sans selection:bg-accent selection:text-black">
+    // MONOCHROME THEME: Pure black bg, white text, white selection
+    <div className="fixed inset-0 flex h-[100dvh] w-screen bg-black text-white overflow-hidden font-sans selection:bg-white selection:text-black">
       
-      {/* --- AMBIENT BACKGROUND GLOWS --- */}
+      {/* --- MINIMALIST AMBIENT BACKGROUND GLOWS --- */}
       <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-0 left-1/4 w-96 h-96 bg-purple-600/20 rounded-full blur-[100px] animate-blob"></div>
-          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-cyan-600/10 rounded-full blur-[100px] animate-blob animation-delay-2000"></div>
-          <div className="absolute top-1/2 left-1/2 w-80 h-80 bg-blue-600/10 rounded-full blur-[120px] animate-blob animation-delay-4000"></div>
+          {/* Subtle White Spotlights for depth instead of colored blobs */}
+          <div className="absolute top-[-10%] left-[-10%] w-[40vw] h-[40vw] bg-white/[0.02] rounded-full blur-[120px]"></div>
+          <div className="absolute bottom-[-10%] right-[-10%] w-[40vw] h-[40vw] bg-white/[0.02] rounded-full blur-[120px]"></div>
       </div>
 
-      {/* Noise Texture */}
-      <div className="bg-noise"></div>
+      {/* Grid Pattern instead of heavy noise */}
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none z-0"></div>
 
       {/* --- SIDEBAR --- */}
-      <div className="w-[70px] md:w-[80px] h-full flex-shrink-0 relative z-50 transition-all duration-300 border-r border-white/5 bg-black/20 backdrop-blur-md">
+      <div className="w-[70px] md:w-[80px] h-full flex-shrink-0 relative z-50 transition-all duration-300 border-r border-white/10 bg-[#050505] backdrop-blur-md">
         <Sidebar 
             items={navItems} 
             y={y} 
@@ -68,44 +71,47 @@ const Layout = () => {
       {/* --- CONTENT AREA --- */}
       <div className="flex-1 h-full relative flex flex-col z-10 overflow-hidden">
         
-        {/* Background Big Text */}
-        <div className="absolute right-[-5%] bottom-[-5%] select-none pointer-events-none opacity-[0.03] overflow-hidden">
+        {/* Background Big Text - Ultra low opacity for B&W balance */}
+        <div className="absolute right-[-2%] bottom-[-5%] select-none pointer-events-none overflow-hidden z-0">
             <motion.h1 
                 key={activeIndex}
                 initial={{ x: 50, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                className="text-[20vw] font-black text-white leading-none whitespace-nowrap font-space"
+                animate={{ x: 0, opacity: 0.02 }}
+                transition={{ duration: 1, ease: "easeOut" }}
+                className="text-[18vw] font-black text-white leading-none whitespace-nowrap tracking-tighter"
             >
                 {navItems[activeIndex].name}
             </motion.h1>
         </div>
 
-        {/* Top Tagline */}
-        <div className="absolute top-8 left-8 md:left-16 flex items-center gap-4 z-20 opacity-80">
-           <div className="w-12 h-[1px] bg-accent"></div>
-           <span className="text-accent font-mono text-xs tracking-[0.4em] uppercase">
+        {/* Top Tagline - Neutral Grays */}
+        <div className="absolute top-8 left-8 md:left-16 flex items-center gap-4 z-20">
+           <div className="w-12 h-[1px] bg-white/30"></div>
+           <span className="text-neutral-400 font-mono text-xs tracking-[0.4em] uppercase font-medium">
              {navItems[activeIndex].tagline}
            </span>
         </div>
 
-        {/* CHANGE 2: Scrollable Content - Added 'pb-24' for mobile space */}
+        {/* --- SCROLLABLE CONTENT WITH ADVANCED PAGE TRANSITIONS --- */}
+        <div className="flex-1 w-full h-full overflow-y-auto overflow-x-hidden pt-24 md:pt-0 scrollbar-hide relative z-10">
+           <div className="min-h-full w-full max-w-7xl mx-auto p-6 md:p-16 flex items-center justify-center">
+             
+             {/* mode="wait" ensures current page exits fully before next page enters */}
+             <AnimatePresence mode="wait">
+               <motion.div
+                 key={location.pathname}
+                 initial={{ opacity: 0, y: 30, filter: "blur(15px)" }}
+                 animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                 exit={{ opacity: 0, y: -30, filter: "blur(15px)" }}
+                 transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                 className="w-full"
+               >
+                  <Outlet /> 
+               </motion.div>
+             </AnimatePresence>
 
-<div className="flex-1 w-full h-full overflow-y-auto overflow-x-hidden pt-24 md:pt-0">
-   <div className="min-h-full w-full max-w-7xl mx-auto p-6 md:p-16 flex items-center justify-center">
-     <AnimatePresence mode="wait">
-       <motion.div
-         key={location.pathname}
-         initial={{ opacity: 0, scale: 0.98, filter: "blur(10px)" }}
-         animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-         exit={{ opacity: 0, scale: 1.02, filter: "blur(10px)" }}
-         transition={{ duration: 0.5, ease: "easeOut" }}
-         className="w-full"
-       >
-          <Outlet /> 
-       </motion.div>
-     </AnimatePresence>
-   </div>
-</div>
+           </div>
+        </div>
 
       </div>
     </div>
