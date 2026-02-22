@@ -1,108 +1,126 @@
-import React from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowUpRight, Github } from "lucide-react";
+import mediflowImg from "../../assets/images/medi.png";
+import alumniImg from "../../assets/images/ac.png";
+import momentumImg from "../../assets/images/momentum.png";
 
-// --- ANIMATION VARIANTS ---
-const containerVar = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { staggerChildren: 0.2 } }
-};
-
-const itemVar = {
-  hidden: { y: 40, opacity: 0 },
-  visible: { y: 0, opacity: 1, transition: { duration: 1.2, ease: [0.16, 1, 0.3, 1] } }
-};
-
-// --- PROJECT CARD COMPONENT ---
-const ProjectCard = ({ project }) => (
-  <motion.div variants={itemVar} className="group relative w-full">
-    <div className="relative overflow-hidden rounded-[2rem] bg-[#050505] border border-white/10 hover:border-white/40 transition-all duration-700 p-8 md:p-12 flex flex-col md:flex-row gap-8 justify-between">
-      
-      {/* Subtle background glow on hover */}
-      <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-white/[0.03] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"></div>
-
-      <div className="flex-1 space-y-6 relative z-10">
-        <div className="flex items-center gap-4">
-           <span className="text-[10px] font-mono text-neutral-500 tracking-[0.2em] uppercase">{project.type}</span>
-           <div className="h-[1px] w-12 bg-white/20"></div>
-        </div>
-        <h3 className="text-4xl md:text-5xl font-medium text-white tracking-tight">
-          {project.title}
-        </h3>
-        <p className="text-neutral-400 text-base leading-relaxed max-w-2xl font-light">
-          {project.description}
-        </p>
-        <div className="flex flex-wrap gap-2 pt-4">
-          {project.tags.map((tag, i) => (
-            <span key={i} className="px-4 py-1.5 text-[10px] font-mono tracking-widest text-neutral-300 border border-white/10 rounded-full hover:bg-white hover:text-black transition-all duration-300 cursor-default uppercase">
-              {tag}
-            </span>
-          ))}
-        </div>
-      </div>
-
-      <div className="flex md:flex-col gap-4 shrink-0 relative z-10">
-        <a href={project.github} target="_blank" rel="noreferrer" className="h-14 w-14 flex items-center justify-center rounded-full border border-white/20 text-neutral-400 hover:bg-white hover:text-black transition-all duration-500">
-          <Github size={20} />
-        </a>
-        <a href={project.link} target="_blank" rel="noreferrer" className="h-14 w-14 flex items-center justify-center rounded-full bg-white text-black hover:scale-110 transition-transform duration-500">
-          <ArrowUpRight size={20} />
-        </a>
-      </div>
-    </div>
-  </motion.div>
-);
-
-// --- MAIN SECTION ---
 export const ProjectsSection = () => {
-  // ALL 3 PROJECTS RESTORED HERE
   const projects = [
     {
       title: "MediFlow SmartPad",
-      description: "An AI-powered clinical assistant utilizing RAG. Features advanced prescription safety analysis, drug interaction mapping, and automated charting.",
-      tags: ["React", "Python/FastAPI", "ChromaDB", "AI"],
+      description: "An AI-powered clinical assistant utilizing RAG. Features advanced prescription safety analysis.",
+      tags: ["React", "FastAPI", "AI"],
       link: "https://github.com/code-a13/rag_ai", 
       github: "https://github.com/code-a13/rag_ai",
-      type: "AI Healthcare Platform"
+      type: "AI Healthcare",
+      image: mediflowImg 
     },
     {
       title: "AlumniConnect",
-      description: "A full-stack ecosystem bridging students and alumni. Features real-time socket chat, job portals, and event orchestration.",
-      tags: ["MERN Stack", "Socket.io", "Redux"],
+      description: "A full-stack ecosystem bridging students and alumni with real-time socket chat.",
+      tags: ["MERN", "Socket.io", "Redux"],
       link: "https://alumniconnect.me",
       github: "https://github.com/code-a13/AlumniConnect.git",
-      type: "Full Stack Platform"
+      type: "Full Stack Platform",
+      image: alumniImg 
     },
     {
       title: "Momentum",
-      description: "A lightweight, dependency-free productivity suite built purely on the DOM. Optimized for zero-latency performance and instant load times.",
+      description: "A lightweight, dependency-free productivity suite built purely on the DOM.",
       tags: ["Vanilla JS", "HTML5", "CSS3"],
       link: "https://momentum13.vercel.app/",
       github: "https://github.com/code-a13/MOMENTUM-JS_LAB_PROJECT.git",
-      type: "Productivity App"
+      type: "Productivity App",
+      image: momentumImg 
     }
   ];
 
   return (
-    <section className="w-full h-full flex flex-col gap-12 pb-16 pt-10">
-      <motion.div variants={containerVar} initial="hidden" animate="visible" className="w-full">
-        
-        {/* Section Header */}
-        <motion.div variants={itemVar} className="flex items-center justify-between mb-16">
-           <h2 className="text-4xl md:text-5xl font-medium text-white tracking-tighter">
-             Selected Works.
-           </h2>
-           <div className="h-[1px] flex-1 bg-white/10 ml-8"></div>
-        </motion.div>
-        
-        {/* Project Cards Grid */}
-        <div className="grid grid-cols-1 gap-8">
-          {projects.map((project, index) => (
-             <ProjectCard key={index} project={project} />
-          ))}
-        </div>
-        
+    <section className="w-full relative min-h-screen py-20 px-4 md:px-16 overflow-hidden">
+      
+      <motion.div 
+        initial={{ opacity: 0, y: -20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        className="w-full mb-16 flex flex-col items-center md:items-start"
+      >
+         <h2 className="text-4xl md:text-6xl font-bold text-white tracking-tighter uppercase">
+           Selected Works
+         </h2>
+         <div className="h-[2px] w-24 bg-white/20 mt-4"></div>
       </motion.div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
+        {projects.map((project, i) => (
+          <FlipCard key={i} project={project} index={i} />
+        ))}
+      </div>
     </section>
+  );
+};
+
+const FlipCard = ({ project, index }) => {
+  const [isFlipped, setIsFlipped] = useState(false);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 50 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.6, delay: index * 0.1 }}
+      className="relative w-full aspect-square cursor-pointer [perspective:1000px] group"
+      onMouseEnter={() => setIsFlipped(true)}
+      onMouseLeave={() => setIsFlipped(false)}
+      onClick={() => window.open(project.link, "_blank")}
+    >
+      <motion.div
+        className="w-full h-full relative [transform-style:preserve-3d]"
+        animate={{ rotateY: isFlipped ? 180 : 0 }}
+        transition={{ duration: 0.6, type: "spring", stiffness: 200, damping: 20 }}
+      >
+        
+        {/* FRONT FACE */}
+        <div className="absolute inset-0 w-full h-full bg-[#080808] border border-white/10 rounded-[2rem] p-8 flex flex-col justify-between [backface-visibility:hidden]">
+           <div className="space-y-4">
+              <span className="text-xs font-mono text-neutral-500 tracking-[0.2em] uppercase">{project.type}</span>
+              <h3 className="text-3xl font-medium text-white tracking-tight">{project.title}</h3>
+              <p className="text-neutral-400 text-sm leading-relaxed font-light line-clamp-4">
+                {project.description}
+              </p>
+           </div>
+
+           <div className="flex flex-wrap gap-2">
+             {project.tags.map((tag, idx) => (
+               <span key={idx} className="px-3 py-1.5 text-[10px] font-mono tracking-widest text-neutral-300 border border-white/10 rounded-full uppercase bg-white/5">
+                 {tag}
+               </span>
+             ))}
+           </div>
+           
+           <div className="absolute top-8 right-8 text-white/20 group-hover:text-white transition-colors duration-300">
+              <ArrowUpRight size={24} />
+           </div>
+        </div>
+
+        {/* BACK FACE */}
+        <div className="absolute inset-0 w-full h-full rounded-[2rem] overflow-hidden border border-white/20 [backface-visibility:hidden] [transform:rotateY(180deg)]">
+           <img 
+             src={project.image} 
+             alt={project.title}
+             className="w-full h-full object-cover scale-110 group-hover:scale-100 transition-transform duration-700"
+           />
+           <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/20 flex flex-col justify-end p-8">
+              <div className="flex items-center justify-between">
+                <span className="text-white font-mono text-sm tracking-widest uppercase font-bold">Redirect to App</span>
+                <div className="h-10 w-10 bg-white text-black rounded-full flex items-center justify-center">
+                  <ArrowUpRight size={20} />
+                </div>
+              </div>
+           </div>
+        </div>
+
+      </motion.div>
+    </motion.div>
   );
 };

@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowUpRight, Terminal, Cpu, Download, Database } from "lucide-react";
-import { JavaCodeBackground } from "./JavaCodeBackground"; // Make sure to import it!
+import { ThreeBackground } from "./ThreeBackground";
 
 // --- ADVANCED SLOW SPOTLIGHT GRID ---
 const SpotlightGrid = () => (
@@ -51,8 +51,8 @@ const TechBadge = ({ icon, text }) => (
 );
 
 export const HeroSection = () => (
-  <section className="relative w-full min-h-[85vh] flex flex-col items-center justify-center text-center gap-8 rounded-[2rem] overflow-hidden border border-white/10 bg-black p-8 lg:p-16">
-    <JavaCodeBackground />
+  <section className="relative w-full min-h-screen flex flex-col items-center justify-center text-center gap-8 overflow-hidden px-4">
+    <ThreeBackground />
     <SpotlightGrid />
 
     <motion.div variants={containerVar} initial="hidden" animate="visible" className="z-10 w-full max-w-4xl relative flex flex-col items-center">

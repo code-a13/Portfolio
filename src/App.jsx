@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Layout from './components/Layout';
 
-// Import the Sections (Or separate page files if you have them)
+
 import { 
   HeroSection, 
   ProjectsSection, 
@@ -23,6 +23,7 @@ function App() {
           <Route path="/contact" element={<ContactSection />} />
         </Route>
       </Routes>
+      
     </Router>
   );
 }
