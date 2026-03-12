@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { motion, useMotionValue, animate, AnimatePresence, useSpring, useTransform } from "framer-motion";
 import { Terminal, Briefcase, User, Mail, Award } from "lucide-react"; 
@@ -16,11 +16,56 @@ export const navItems = [
   { id: "contact", path: "/contact", name: "CONTACT", tagline: "LINK", icon: <Mail size={24}/> },
 ];
 
+// --- CUSTOM SCROLL HOOK (Built directly into the layout) ---
+const useMouseScrollNavigation = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const isScrolling = useRef(false);
+
+  useEffect(() => {
+    // Get all the paths in exact order from navItems
+    const routes = navItems.map(item => item.path);
+
+    const handleWheel = (e) => {
+      if (isScrolling.current) return;
+
+      const currentIndex = routes.indexOf(location.pathname);
+      if (currentIndex === -1) return;
+
+      // Scrolling Down (Next Page)
+      if (e.deltaY > 50) {
+        if (currentIndex < routes.length - 1) {
+          isScrolling.current = true;
+          navigate(routes[currentIndex + 1]);
+          setTimeout(() => (isScrolling.current = false), 1200); 
+        }
+      } 
+      // Scrolling Up (Previous Page)
+      else if (e.deltaY < -50) {
+        if (currentIndex > 0) {
+          isScrolling.current = true;
+          navigate(routes[currentIndex - 1]);
+          setTimeout(() => (isScrolling.current = false), 1200);
+        }
+      }
+    };
+
+    window.addEventListener("wheel", handleWheel, { passive: false });
+    return () => window.removeEventListener("wheel", handleWheel);
+    
+  }, [location.pathname, navigate]);
+};
+
+
+// --- MAIN LAYOUT COMPONENT ---
 const Layout = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const y = useMotionValue(0);
   const [activeIndex, setActiveIndex] = useState(0);
+
+  // ACTIVATE SCROLL NAVIGATION HERE!
+  useMouseScrollNavigation();
 
   // --- MOUSE TRACKING FOR BACKGROUND TEXT ---
   const mouseX = useMotionValue(0);
