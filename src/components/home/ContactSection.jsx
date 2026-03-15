@@ -85,7 +85,7 @@ export const ContactSection = () => {
 
           {/* THE FIX: Strict grid-cols-3 on mobile to force social buttons onto a SINGLE row. NEVER stacks vertically now! */}
           <motion.div variants={itemVar} className="grid grid-cols-3 md:flex md:flex-col gap-2 md:gap-4 pt-0 md:pt-4">
-            <a href="mailto:your.email@gmail.com" className="group flex flex-col md:flex-row items-center justify-center md:justify-start gap-1 md:gap-4 w-full py-1.5 md:py-0 rounded-xl md:rounded-none border border-white/10 md:border-0 bg-white/[0.02] md:bg-transparent">
+            <a href="mailto:adityakrishnamoorthi13@gmail.com" className="group flex flex-col md:flex-row items-center justify-center md:justify-start gap-1 md:gap-4 w-full py-1.5 md:py-0 rounded-xl md:rounded-none border border-white/10 md:border-0 bg-white/[0.02] md:bg-transparent">
               <div className="w-6 h-6 md:w-12 md:h-12 rounded-full border md:border border-white/10 md:bg-white/[0.02] flex items-center justify-center group-hover:bg-white group-hover:text-black transition-all duration-500">
                 <Mail size={10} className="md:w-[18px] md:h-[18px]" />
               </div>

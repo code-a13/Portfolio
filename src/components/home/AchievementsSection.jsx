@@ -157,12 +157,10 @@ export const AchievementsSection = () => {
   }, [isPaused]);
 
   return (
-    // THE FIX: Changed to `h-full`. Removed `py-12` on mobile so it centers naturally within the Layout's safe zone.
     <section className="relative w-full h-full flex flex-col items-center justify-center text-white gap-4 md:gap-8 py-2 md:py-16">
       
       <motion.div variants={containerVar} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} className="z-10 w-full relative flex flex-col items-center">
         
-        {/* THE FIX: Compressed mobile margin from mb-8 to mb-4. */}
         <div className="max-w-6xl mx-auto w-full px-6 md:px-8 mb-4 md:mb-12 mt-2 md:mt-0">
           <motion.div variants={itemVar} className="inline-flex items-center gap-2 md:gap-3 px-3 md:px-4 py-1.5 md:py-2 rounded-full border border-white/20 bg-white/5 backdrop-blur-md mb-3 md:mb-6">
             <span className="relative flex h-1.5 w-1.5 md:h-2 md:w-2">
@@ -192,11 +190,11 @@ export const AchievementsSection = () => {
             onMouseLeave={() => setIsPaused(false)}
             onTouchStart={() => setIsPaused(true)}
             onTouchEnd={() => setIsPaused(false)}
-            className="flex gap-4 md:gap-8 w-full overflow-x-auto hide-scrollbar cursor-grab active:cursor-grabbing px-6 md:px-8 pb-4 md:pb-8 touch-pan-y" 
+            // THE FIX: Removed 'touch-pan-y'. The browser will now naturally allow horizontal swiping!
+            className="flex gap-4 md:gap-8 w-full overflow-x-auto hide-scrollbar cursor-grab active:cursor-grabbing px-6 md:px-8 pb-4 md:pb-8" 
           >
             {duplicatedAchievements.map((item, index) => (
               
-              // THE FIX: Mobile card height reduced slightly to h-[320px] to ensure it clears the bottom dock entirely.
               <div 
                 key={`${item.id}-${index}`} 
                 className="group/card relative w-[85vw] sm:w-[350px] md:w-[400px] h-[320px] md:h-[450px] cursor-pointer perspective-[1000px] shrink-0"
@@ -204,7 +202,6 @@ export const AchievementsSection = () => {
                 <div className="w-full h-full relative transition-transform duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] [transform-style:preserve-3d] group-hover/card:[transform:rotateY(180deg)]">
                   
                   {/* --- FRONT OF CARD --- */}
-                  {/* THE FIX: Padding reduced from p-6 to p-5 on mobile to fit the smaller height */}
                   <div className="absolute inset-0 w-full h-full [backface-visibility:hidden] bg-white/[0.02] backdrop-blur-md border border-white/10 p-5 md:p-10 flex flex-col rounded-[2rem] overflow-hidden">
                      <div className="absolute inset-0 bg-gradient-to-b from-white/[0.03] to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity duration-700" />
                      
@@ -212,7 +209,6 @@ export const AchievementsSection = () => {
                         {item.year}
                      </span>
                      
-                     {/* Tightened leading on title to save space */}
                      <h3 className="relative z-10 text-xl md:text-3xl font-medium mb-2 md:mb-4 tracking-tight text-white leading-tight line-clamp-2">
                         {item.title}
                      </h3>
