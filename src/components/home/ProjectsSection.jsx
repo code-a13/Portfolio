@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowUpRight, Github } from "lucide-react";
 
@@ -8,10 +8,27 @@ import alumniImg from "../../assets/images/ac.png";
 import momentumImg from "../../assets/images/momentum.png";
 import multiMartImg from "../../assets/images/multimart.png"; 
 
+// --- CINEMATIC ANIMATION VARIANTS ---
+const containerVar = {
+  hidden: { opacity: 0 },
+  visible: { 
+    opacity: 1, 
+    transition: { staggerChildren: 0.15, delayChildren: 0.2 } 
+  }
+};
+
+const itemVar = {
+  hidden: { y: 30, opacity: 0, filter: "blur(12px)", scale: 0.98 },
+  visible: { 
+    y: 0, 
+    opacity: 1, 
+    filter: "blur(0px)", 
+    scale: 1, 
+    transition: { duration: 1.5, ease: [0.16, 1, 0.3, 1] } 
+  }
+};
+
 export const ProjectsSection = () => {
-  const scrollRef = useRef(null);
-  const [isPaused, setIsPaused] = useState(false);
-  const directionRef = useRef(1); // 1 for right, -1 for left
 
   const projects = [
     {
@@ -52,37 +69,13 @@ export const ProjectsSection = () => {
     }
   ];
 
-  // Hybrid Auto-Scroll (Ping-Pong) + Manual Swipe Logic
-  useEffect(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-
-    let animationFrameId;
-    
-    const scroll = () => {
-      if (!isPaused) {
-        el.scrollLeft += (1.5 * directionRef.current); 
-        
-        if (el.scrollLeft >= el.scrollWidth - el.clientWidth - 2) {
-          directionRef.current = -1;
-        }
-        else if (el.scrollLeft <= 2) {
-          directionRef.current = 1;
-        }
-      }
-      animationFrameId = requestAnimationFrame(scroll);
-    };
-
-    animationFrameId = requestAnimationFrame(scroll);
-
-    return () => cancelAnimationFrame(animationFrameId);
-  }, [isPaused]);
+  // THE FIX: Completely removed the auto-scroll useEffect and the duplicated array.
+  // It is now a highly performant, static list of exactly 4 cards.
 
   return (
-    // THE FIX: Added h-full and compressed mobile padding to py-2 to lock it into the viewport
     <section className="relative w-full h-full flex flex-col justify-center bg-transparent text-white overflow-hidden py-2 md:py-16">
       
-      {/* THE FIX: Compressed mobile margins (mb-4, mt-2) */}
+      {/* Header Container */}
       <div className="max-w-7xl mx-auto w-full px-6 md:px-8 mb-4 md:mb-12 mt-2 md:mt-0 relative z-10">
         <motion.div 
           initial={{ opacity: 0, y: -20 }}
@@ -97,6 +90,7 @@ export const ProjectsSection = () => {
         </motion.div>
       </div>
 
+      {/* Swipeable Container */}
       <div className="relative w-full overflow-hidden flex group">
         
         <style>
@@ -106,14 +100,9 @@ export const ProjectsSection = () => {
           `}
         </style>
 
-        <div 
-          ref={scrollRef}
-          onMouseEnter={() => setIsPaused(true)}
-          onMouseLeave={() => setIsPaused(false)}
-          onTouchStart={() => setIsPaused(true)}
-          onTouchEnd={() => setIsPaused(false)}
-          className="flex gap-4 md:gap-8 w-full overflow-x-auto hide-scrollbar cursor-grab active:cursor-grabbing px-6 md:px-8 pb-4 md:pb-8 touch-pan-y"
-        >
+        {/* THE FIX: Purely native CSS horizontal scrolling. Clean, fast, no JS overhead. */}
+        <div className="flex gap-4 md:gap-8 w-full overflow-x-auto hide-scrollbar px-6 md:px-8 pb-4 md:pb-8">
+          {/* Mapping the ORIGINAL array, no duplication! */}
           {projects.map((project, i) => (
             <FlipCard key={`${project.title}-${i}`} project={project} index={i} />
           ))}
@@ -130,7 +119,6 @@ const FlipCard = ({ project, index }) => {
 
   return (
     <div
-      // THE FIX: Reduced mobile card height to h-[320px] to ensure it comfortably clears the bottom dock
       className="relative w-[85vw] sm:w-[350px] md:w-[400px] h-[320px] md:h-[450px] cursor-pointer perspective-[1000px] shrink-0 group/card"
       onMouseEnter={() => setIsFlipped(true)}
       onMouseLeave={() => setIsFlipped(false)}
@@ -143,7 +131,6 @@ const FlipCard = ({ project, index }) => {
       >
         
         {/* FRONT FACE */}
-        {/* THE FIX: Reduced inner padding to p-5 on mobile to balance the shorter height */}
         <div className="absolute inset-0 w-full h-full bg-white/[0.02] backdrop-blur-md border border-white/10 rounded-3xl p-5 md:p-10 flex flex-col justify-between [backface-visibility:hidden]">
            
            <div className="absolute inset-0 bg-gradient-to-b from-white/[0.05] to-transparent rounded-3xl pointer-events-none" />
