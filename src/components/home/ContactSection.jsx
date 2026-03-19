@@ -97,7 +97,7 @@ export const ContactSection = () => {
               </div>
               <span className="font-mono text-[8px] md:text-sm tracking-widest text-neutral-400 group-hover:text-white transition-colors uppercase">Github</span>
             </a>
-            <a href="https://linkedin.com/in/yourprofile" target="_blank" rel="noreferrer" className="group flex flex-col md:flex-row items-center justify-center md:justify-start gap-1 md:gap-4 w-full py-1.5 md:py-0 rounded-xl md:rounded-none border border-white/10 md:border-0 bg-white/[0.02] md:bg-transparent">
+            <a href="https://www.linkedin.com/in/aditya-k-3875a7399" target="_blank" rel="noreferrer" className="group flex flex-col md:flex-row items-center justify-center md:justify-start gap-1 md:gap-4 w-full py-1.5 md:py-0 rounded-xl md:rounded-none border border-white/10 md:border-0 bg-white/[0.02] md:bg-transparent">
               <div className="w-6 h-6 md:w-12 md:h-12 rounded-full border md:border border-white/10 md:bg-white/[0.02] flex items-center justify-center group-hover:bg-[#0A66C2] md:group-hover:border-[#0A66C2] group-hover:text-white transition-all duration-500">
                 <Linkedin size={10} className="md:w-[18px] md:h-[18px]" />
               </div>
