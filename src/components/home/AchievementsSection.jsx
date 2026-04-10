@@ -21,52 +21,67 @@ const LeetCodeLogo = ({ className }) => (
   </svg>
 );
 
-// --- DYNAMIC LEETCODE COMPONENT (RESPONSIVE & COMPACT ON MOBILE) ---
+// --- DYNAMIC LEETCODE COMPONENT ---
 const LeetCodeStatCard = ({ username }) => {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
-
+  const [errorMsg, setErrorMsg] = useState(null);
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        // THE FIX: Wrapped the Heroku URL inside a free CORS proxy (allorigins)
-        // This bypasses the Vercel live block completely!
-        const targetUrl = encodeURIComponent(`https://leetcode-stats-api.herokuapp.com/${username}`);
-        const res = await fetch(`https://api.allorigins.win/raw?url=${targetUrl}`);
-        
-        const data = await res.json();
-        
-        if (data.status === "success") {
-          setStats(data);
+        // THE FIX: Using the much more reliable Alfa LeetCode API.
+        // We fetch solved stats and profile ranking in parallel for max speed!
+        const [solvedRes, profileRes] = await Promise.all([
+          fetch(`https://alfa-leetcode-api.onrender.com/${username}/solved`),
+          fetch(`https://alfa-leetcode-api.onrender.com/${username}`)
+        ]);
+
+        if (!solvedRes.ok || !profileRes.ok) throw new Error("API Server Issue");
+
+        const solvedData = await solvedRes.json();
+        const profileData = await profileRes.json();
+
+        // Check if user exists but has no data
+        if (solvedData.errors || profileData.errors) {
+           throw new Error("User not found or private");
         }
+
+        // Map the new API's data structure to our UI perfectly
+        setStats({
+          totalSolved: solvedData.solvedProblem || 0,
+          ranking: profileData.ranking || 0,
+          easySolved: solvedData.easySolved || 0,
+          mediumSolved: solvedData.mediumSolved || 0,
+          hardSolved: solvedData.hardSolved || 0,
+          // Fallback to approximate total counts if API doesn't provide them
+          totalEasy: 824, 
+          totalMedium: 1704,
+          totalHard: 726
+        });
       } catch (error) {
-        console.error("Failed to fetch LeetCode stats", error);
+        console.error("Failed to fetch LeetCode stats:", error);
+        setErrorMsg("API Sync Failed");
       } finally {
         setLoading(false);
       }
     };
-    
     fetchStats();
   }, [username]);
 
-
   return (
-    // THE FIX: Removed massive fixed heights on mobile. Uses flex-col xl:w-[350px] for layout matching.
-    <div className="relative w-full xl:w-[350px] shrink-0 bg-[#050505] border border-[#ffa116]/20 p-5 md:p-8 flex flex-col rounded-[2rem] overflow-hidden group hover:border-[#ffa116]/50 transition-colors duration-500">
+    <div className="relative w-full xl:w-[380px] h-[380px] xl:h-[420px] shrink-0 bg-[#050505] border border-[#ffa116]/30 p-6 md:p-8 flex flex-col justify-between rounded-2xl md:rounded-[2rem] overflow-hidden group hover:border-[#ffa116]/60 transition-colors duration-500">
       
-      {/* Background Watermark */}
-      <div className="absolute top-[-20%] right-[-10%] p-8 opacity-5 pointer-events-none">
+      <div className="absolute top-[-10%] right-[-10%] p-8 opacity-[0.03] pointer-events-none">
         <LeetCodeLogo className="w-48 h-48 md:w-64 md:h-64" />
       </div>
 
-      {/* Header */}
-      <div className="relative z-10 flex items-center justify-between mb-4 md:mb-8">
+      <div className="relative z-10 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-white/5 border border-white/10 rounded-lg group-hover:bg-[#ffa116]/10 transition-colors">
+          <div className="p-2 bg-white/5 border border-white/10 rounded-lg">
             <LeetCodeLogo className="w-5 h-5 text-[#ffa116]" />
           </div>
-          <h3 className="text-lg md:text-xl font-bold tracking-tight text-white">LeetCode</h3>
+          <h3 className="text-lg font-bold tracking-tight text-white">LeetCode</h3>
         </div>
         <a href={`https://leetcode.com/u/${username}/`} target="_blank" rel="noreferrer" className="text-[10px] md:text-xs font-mono text-neutral-500 hover:text-[#ffa116] flex items-center gap-1 transition-colors">
           Profile <ArrowUpRight size={14} />
@@ -74,14 +89,11 @@ const LeetCodeStatCard = ({ username }) => {
       </div>
 
       {loading ? (
-        // THE FIX: Crazy Pattern Data Loader instead of basic circle!
-        <div className="flex-1 flex flex-col items-center justify-center py-8 gap-4 z-10">
+        <div className="relative z-10 flex-1 flex flex-col items-center justify-center gap-4">
           <div className="flex gap-1.5 items-end h-8">
              {[0, 1, 2, 3, 4].map((i) => (
-                <motion.div
-                  key={i}
-                  className="w-1.5 bg-[#ffa116] rounded-full"
-                  animate={{ height: ["10px", "32px", "10px"] }}
+                <motion.div key={i} className="w-1.5 bg-[#ffa116] rounded-full"
+                  animate={{ height: ["10px", "28px", "10px"] }}
                   transition={{ duration: 0.8, repeat: Infinity, delay: i * 0.15, ease: "easeInOut" }}
                 />
              ))}
@@ -89,48 +101,50 @@ const LeetCodeStatCard = ({ username }) => {
           <span className="text-[10px] font-mono tracking-widest text-[#ffa116] uppercase animate-pulse">Syncing...</span>
         </div>
       ) : stats ? (
-        // THE FIX: Flex-row on mobile screens so it fits compactly, Flex-col on Desktop!
-        <div className="relative z-10 flex-1 flex flex-col sm:flex-row xl:flex-col gap-4 md:gap-8 justify-between">
+        <div className="relative z-10 flex-1 flex flex-col justify-between mt-6 xl:mt-8">
           
-          <div className="flex-1 grid grid-cols-2 gap-3 md:gap-4">
-            <div className="bg-white/[0.02] border border-white/5 rounded-xl p-3 md:p-4">
-              <span className="text-[10px] text-neutral-500 font-mono uppercase tracking-widest block mb-1">Total_Solved</span>
-              <span className="text-2xl md:text-4xl font-light text-white">{stats.totalSolved}</span>
+          <div className="grid grid-cols-2 gap-4 w-full">
+            <div className="bg-white/[0.02] border border-white/5 rounded-xl p-4 flex flex-col items-center justify-center text-center">
+              <span className="text-[10px] text-neutral-500 font-mono tracking-widest block mb-2">SOLVED</span>
+              <span className="text-3xl xl:text-4xl font-light text-white">{stats.totalSolved}</span>
             </div>
-            <div className="bg-white/[0.02] border border-white/5 rounded-xl p-3 md:p-4">
-              <span className="text-[10px] text-neutral-500 font-mono uppercase tracking-widest block mb-1">Global_Rank</span>
-              <span className="text-lg md:text-2xl font-light text-white">#{stats.ranking.toLocaleString()}</span>
+            <div className="bg-white/[0.02] border border-white/5 rounded-xl p-4 flex flex-col items-center justify-center text-center">
+              <span className="text-[10px] text-neutral-500 font-mono tracking-widest block mb-2">RANK</span>
+              <span className="text-xl xl:text-2xl font-light text-white">
+                {stats.ranking > 1000 ? (stats.ranking/1000).toFixed(1)+'k' : stats.ranking}
+              </span>
             </div>
           </div>
 
-          <div className="flex-1 space-y-3 md:space-y-4 font-mono text-[10px] md:text-xs flex flex-col justify-center">
+          <div className="w-full flex flex-col gap-3 font-mono">
             <div className="flex items-center gap-3">
-              <span className="w-12 md:w-14 text-[#00b8a3]">Easy</span>
+              <span className="text-xs text-[#00b8a3] w-10">Easy</span>
               <div className="flex-1 h-1.5 bg-white/5 rounded-full overflow-hidden">
                 <div className="h-full bg-[#00b8a3]" style={{ width: `${(stats.easySolved / stats.totalEasy) * 100}%` }}></div>
               </div>
-              <span className="w-8 text-right text-white">{stats.easySolved}</span>
+              <span className="text-xs text-white w-8 text-right">{stats.easySolved}</span>
             </div>
             <div className="flex items-center gap-3">
-              <span className="w-12 md:w-14 text-[#ffc01e]">Medium</span>
+              <span className="text-xs text-[#ffc01e] w-10">Med</span>
               <div className="flex-1 h-1.5 bg-white/5 rounded-full overflow-hidden">
                 <div className="h-full bg-[#ffc01e]" style={{ width: `${(stats.mediumSolved / stats.totalMedium) * 100}%` }}></div>
               </div>
-              <span className="w-8 text-right text-white">{stats.mediumSolved}</span>
+              <span className="text-xs text-white w-8 text-right">{stats.mediumSolved}</span>
             </div>
             <div className="flex items-center gap-3">
-              <span className="w-12 md:w-14 text-[#ff375f]">Hard</span>
+              <span className="text-xs text-[#ff375f] w-10">Hard</span>
               <div className="flex-1 h-1.5 bg-white/5 rounded-full overflow-hidden">
                 <div className="h-full bg-[#ff375f]" style={{ width: `${(stats.hardSolved / stats.totalHard) * 100}%` }}></div>
               </div>
-              <span className="w-8 text-right text-white">{stats.hardSolved}</span>
+              <span className="text-xs text-white w-8 text-right">{stats.hardSolved}</span>
             </div>
           </div>
 
         </div>
       ) : (
-        <div className="flex-1 flex items-center justify-center text-red-400 text-xs font-mono py-8">
-          [ API Connection Failed ]
+        <div className="flex-1 flex flex-col items-center justify-center text-neutral-500 font-mono text-[10px] uppercase tracking-widest gap-2">
+          <span className="text-red-400">{errorMsg}</span>
+          <span>Please check later</span>
         </div>
       )}
     </div>
@@ -141,7 +155,7 @@ export const AchievementsSection = () => {
   const scrollRef = useRef(null);
   const [isPaused, setIsPaused] = useState(false);
 
-  // FIXED USERNAME (Your actual github handle)
+  // YOUR USERNAME FIXED!
   const LEETCODE_USERNAME = "codea13"; 
 
   const achievements = [
@@ -163,7 +177,7 @@ export const AchievementsSection = () => {
     },
     { 
       id: 3, 
-      title: "Smart X Hackathon - Participant", 
+      title: "Smart X Hackathon", 
       desc: "Presented a technical project/paper at the Smart X Hackathon, a national-level innovation event organized by the IoT Incubation Centre.", 
       year: "2025",
       image: "/assets/hackathons/ehs.png", 
@@ -251,6 +265,14 @@ export const AchievementsSection = () => {
     }
   ];
 
+  const getBrandBorder = (title) => {
+    if (title.includes("NPTEL")) return "border-red-500/40 group-hover/card:border-red-500/80";
+    if (title.includes("MongoDB")) return "border-green-500/40 group-hover/card:border-green-500/80";
+    if (title.includes("JavaScript") || title.includes("Data Structures") || title.includes("Front-End") || title.includes("OOP") || title.includes("Git")) return "border-blue-500/40 group-hover/card:border-blue-500/80";
+    if (title.includes("Azure")) return "border-[#008AD7]/40 group-hover/card:border-[#008AD7]/80";
+    return "border-white/10 group-hover/card:border-white/40";
+  };
+
   const duplicatedAchievements = [...achievements, ...achievements];
 
   useEffect(() => {
@@ -271,7 +293,7 @@ export const AchievementsSection = () => {
   }, [isPaused]);
 
   return (
-    <section className="relative w-full h-full flex flex-col items-center justify-center text-white gap-4 md:gap-8 py-2 md:py-16 overflow-hidden">
+    <section className="relative w-full min-h-screen flex flex-col items-center justify-center text-white gap-4 md:gap-8 py-10 md:py-16">
       
       <motion.div variants={containerVar} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} className="z-10 w-full relative flex flex-col items-center">
         
@@ -291,10 +313,9 @@ export const AchievementsSection = () => {
 
         <motion.div variants={itemVar} className="relative w-full max-w-[1600px] mx-auto flex flex-col xl:flex-row gap-6 md:gap-8 px-6 md:px-8">
           
-          {/* THE FIX: Highly compact LeetCode bar on mobile */}
           <LeetCodeStatCard username={LEETCODE_USERNAME} />
 
-          <div className="flex-1 overflow-hidden relative group rounded-[2rem]">
+          <div className="flex-1 relative group rounded-2xl md:rounded-[2rem]">
             <style>
               {`
                 .hide-scrollbar::-webkit-scrollbar { display: none; }
@@ -313,27 +334,31 @@ export const AchievementsSection = () => {
               {duplicatedAchievements.map((item, index) => (
                 <div 
                   key={`${item.id}-${index}`} 
-                  className="group/card relative w-[85vw] sm:w-[350px] md:w-[400px] h-[400px] md:h-[450px] cursor-pointer perspective-[1000px] shrink-0"
+                  className="group/card relative w-[85vw] sm:w-[350px] md:w-[400px] h-[380px] xl:h-[420px] cursor-pointer perspective-[1000px] shrink-0"
                 >
                   <div className="w-full h-full relative transition-transform duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] [transform-style:preserve-3d] group-hover/card:[transform:rotateY(180deg)]">
                     
-                    <div className="absolute inset-0 w-full h-full [backface-visibility:hidden] bg-white/[0.02] backdrop-blur-md border border-white/10 p-6 md:p-10 flex flex-col rounded-[2rem] overflow-hidden">
+                    <div className={`absolute inset-0 w-full h-full [backface-visibility:hidden] bg-[#050505] border ${getBrandBorder(item.title)} p-6 md:p-10 flex flex-col justify-between rounded-2xl md:rounded-[2rem] overflow-hidden transition-colors duration-500`}>
                        <div className="absolute inset-0 bg-gradient-to-b from-white/[0.03] to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity duration-700" />
-                       <span className="relative z-10 text-[10px] md:text-xs font-mono font-medium text-neutral-500 mb-3 md:mb-6 block tracking-[0.2em] uppercase">
-                          {item.year}
-                       </span>
-                       <h3 className="relative z-10 text-xl md:text-3xl font-medium mb-3 md:mb-4 tracking-tight text-white leading-tight">
-                          {item.title}
-                       </h3>
-                       <p className="relative z-10 text-neutral-400 text-xs md:text-sm leading-relaxed mt-auto font-light">
-                          {item.desc}
-                       </p>
-                       <div className="relative z-10 mt-4 md:mt-6 flex items-center gap-2 text-[10px] md:text-xs font-mono tracking-widest text-white/30 uppercase">
+                       
+                       <div className="relative z-10">
+                         <span className="text-[10px] md:text-xs font-mono font-medium text-neutral-500 mb-3 block tracking-[0.2em] uppercase">
+                            {item.year}
+                         </span>
+                         <h3 className="text-xl md:text-2xl font-bold mb-3 tracking-tight text-white leading-tight line-clamp-2">
+                            {item.title}
+                         </h3>
+                         <p className="text-neutral-400 text-xs md:text-sm leading-relaxed font-light line-clamp-3 md:line-clamp-4">
+                            {item.desc}
+                         </p>
+                       </div>
+
+                       <div className="relative z-10 flex items-center gap-2 text-[10px] md:text-xs font-mono tracking-widest text-white/30 uppercase mt-4">
                           Hover to view <ArrowUpRight size={14} />
                        </div>
                     </div>
 
-                    <div className="absolute inset-0 w-full h-full [backface-visibility:hidden] [transform:rotateY(180deg)] bg-[#0a0a0a] border border-white/20 rounded-[2rem] overflow-hidden flex flex-col group/back">
+                    <div className={`absolute inset-0 w-full h-full [backface-visibility:hidden] [transform:rotateY(180deg)] bg-[#0a0a0a] border ${getBrandBorder(item.title)} rounded-2xl md:rounded-[2rem] overflow-hidden flex flex-col group/back transition-colors duration-500`}>
                        <div className="relative w-full h-full bg-neutral-900 flex items-center justify-center p-3 md:p-4">
                           <img 
                             src={item.image} 
