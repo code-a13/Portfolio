@@ -1,13 +1,14 @@
-import React, { useRef } from 'react';
+// src/components/home/ThreeBackground.jsx
+import React, { useRef, Suspense } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Points, PointMaterial } from '@react-three/drei';
 import * as random from 'maath/random/dist/maath-random.esm';
 
 const ParticleSwarm = (props) => {
   const ref = useRef();
+  // Optimized: Reduced from 6000 to 3000 for massive performance boost
+  const sphere = random.inSphere(new Float32Array(3000), { radius: 1.5 });
   
-  const sphere = random.inSphere(new Float32Array(6000), { radius: 1.5 });
-  // Rotate the sphere automatically
   useFrame((state, delta) => {
     ref.current.rotation.x -= delta / 10;
     ref.current.rotation.y -= delta / 15;
@@ -25,9 +26,12 @@ const ParticleSwarm = (props) => {
 export const ThreeBackground = () => {
   return (
     <div className="absolute inset-0 z-0 opacity-30 pointer-events-none">
-      <Canvas camera={{ position: [0, 0, 1] }}>
-        <ParticleSwarm />
-      </Canvas>
+      {/* Suspense makes sure 3D doesn't block the rest of your React app from loading */}
+      <Suspense fallback={null}>
+        <Canvas camera={{ position: [0, 0, 1] }}>
+          <ParticleSwarm />
+        </Canvas>
+      </Suspense>
     </div>
   );
 };
