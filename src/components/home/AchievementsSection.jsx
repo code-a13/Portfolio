@@ -26,11 +26,17 @@ const LeetCodeStatCard = ({ username }) => {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
 
+
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const res = await fetch(`https://leetcode-stats-api.herokuapp.com/${username}`);
+        // THE FIX: Wrapped the Heroku URL inside a free CORS proxy (allorigins)
+        // This bypasses the Vercel live block completely!
+        const targetUrl = encodeURIComponent(`https://leetcode-stats-api.herokuapp.com/${username}`);
+        const res = await fetch(`https://api.allorigins.win/raw?url=${targetUrl}`);
+        
         const data = await res.json();
+        
         if (data.status === "success") {
           setStats(data);
         }
@@ -40,8 +46,10 @@ const LeetCodeStatCard = ({ username }) => {
         setLoading(false);
       }
     };
+    
     fetchStats();
   }, [username]);
+
 
   return (
     // THE FIX: Removed massive fixed heights on mobile. Uses flex-col xl:w-[350px] for layout matching.
