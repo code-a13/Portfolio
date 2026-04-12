@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowUpRight, Code2 } from "lucide-react";
+import { ArrowUpRight, ArrowRight, Check } from "lucide-react";
 
 // --- CINEMATIC ANIMATION VARIANTS ---
 const containerVar = {
@@ -13,7 +13,7 @@ const itemVar = {
   visible: { y: 0, opacity: 1, filter: "blur(0px)", scale: 1, transition: { duration: 1.5, ease: [0.16, 1, 0.3, 1] } }
 };
 
-// --- CACHED LEETCODE COMPONENT (BENTO BOX STYLE) ---
+// --- UPDATED VERTICAL LEETCODE COMPONENT ---
 const LeetCodeStatCard = ({ username }) => {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -21,8 +21,7 @@ const LeetCodeStatCard = ({ username }) => {
 
   useEffect(() => {
     const fetchStats = async () => {
-      // 1. CACHING LOGIC: Prevent 429 Errors
-      const CACHE_KEY = `leetcode_data_${username}`;
+      const CACHE_KEY = `leetcode_data_v3_${username}`;
       const CACHE_EXPIRY = 1000 * 60 * 60; // 1 Hour
 
       const cachedData = localStorage.getItem(CACHE_KEY);
@@ -35,20 +34,21 @@ const LeetCodeStatCard = ({ username }) => {
         }
       }
 
-      // 2. NETWORK FETCH
       try {
-        const [solvedRes, profileRes] = await Promise.all([
+        const [solvedRes, profileRes, badgesRes] = await Promise.all([
           fetch(`https://alfa-leetcode-api.onrender.com/${username}/solved`),
-          fetch(`https://alfa-leetcode-api.onrender.com/${username}`)
+          fetch(`https://alfa-leetcode-api.onrender.com/${username}`),
+          fetch(`https://alfa-leetcode-api.onrender.com/${username}/badges`)
         ]);
 
         if (solvedRes.status === 429 || profileRes.status === 429) {
-            throw new Error("Rate Limited. Showing cached data if available.");
+            throw new Error("Rate Limited. Cached data shown if available.");
         }
-        if (!solvedRes.ok || !profileRes.ok) throw new Error("API Server Issue");
+        if (!solvedRes.ok || !profileRes.ok) throw new Error("API Issue");
 
         const solvedData = await solvedRes.json();
         const profileData = await profileRes.json();
+        const badgesData = badgesRes.ok ? await badgesRes.json() : { badges: [] };
 
         if (solvedData.errors || profileData.errors) throw new Error("User not found");
 
@@ -56,9 +56,13 @@ const LeetCodeStatCard = ({ username }) => {
           totalSolved: solvedData.solvedProblem || 0,
           ranking: profileData.ranking || 0,
           easySolved: solvedData.easySolved || 0,
+          totalEasy: solvedData.totalEasy || 800,
           mediumSolved: solvedData.mediumSolved || 0,
+          totalMedium: solvedData.totalMedium || 1600,
           hardSolved: solvedData.hardSolved || 0,
-          totalQuestions: solvedData.totalQuestions || 3000
+          totalHard: solvedData.totalHard || 700,
+          totalQuestions: solvedData.totalQuestions || 3100,
+          badges: badgesData.badges || []
         };
 
         localStorage.setItem(CACHE_KEY, JSON.stringify({
@@ -68,7 +72,6 @@ const LeetCodeStatCard = ({ username }) => {
 
         setStats(newStats);
       } catch (error) {
-        // Fallback to old cache if network fails but cache exists
         if (cachedData) {
             setStats(JSON.parse(cachedData).data);
         } else {
@@ -82,72 +85,154 @@ const LeetCodeStatCard = ({ username }) => {
     fetchStats();
   }, [username]);
 
-  const StatBar = ({ label, solved, total, colorClass }) => {
-    const safeTotal = total > 0 ? total : 1000;
-    const percentage = Math.min((solved / safeTotal) * 100, 100).toFixed(1);
-    
-    return (
-      <div className="flex flex-col gap-1.5 w-full">
-        <div className="flex justify-between items-end font-mono text-[10px] md:text-xs">
-          <span className="text-neutral-400 uppercase tracking-wider">{label}</span>
-          <span className="text-white font-medium">{solved} <span className="text-neutral-600">/ {total}</span></span>
-        </div>
-        <div className="w-full h-1.5 md:h-2 bg-neutral-800 rounded-full overflow-hidden">
-          <motion.div 
-            initial={{ width: 0 }}
-            animate={{ width: `${percentage}%` }}
-            transition={{ duration: 1.5, delay: 0.5, ease: "easeOut" }}
-            className={`h-full rounded-full ${colorClass}`}
-          />
-        </div>
-      </div>
-    );
+  // --- SVG Ring Math ---
+  const radius = 40;
+  const circumference = 2 * Math.PI * radius;
+  
+  const getDashArray = (solved, totalQ) => {
+      if (!totalQ) return `0 ${circumference}`;
+      const percentage = solved / totalQ;
+      // Multiplying by a scale factor purely for visual pop if they haven't solved thousands yet, 
+      // but keeping it proportional to the real numbers.
+      const scaledPercentage = Math.min(percentage * 2, 1); 
+      return `${scaledPercentage * circumference} ${circumference}`;
+  };
+
+  const getOffset = (previousSolved, totalQ) => {
+      if (!totalQ) return 0;
+      const percentage = previousSolved / totalQ;
+      const scaledPercentage = Math.min(percentage * 2, 1);
+      return -(scaledPercentage * circumference);
   };
 
   return (
-    <div className="relative w-full max-w-[400px] xl:max-w-none xl:w-[380px] h-auto shrink-0 bg-[#050505] border border-white/10 p-6 md:p-8 flex flex-col justify-between rounded-2xl md:rounded-[2rem] overflow-hidden group hover:border-[#ffa116]/40 transition-colors duration-500">
+    // Fixed vertical stack for BOTH mobile and desktop
+    <div className="flex flex-col w-full max-w-[340px] xl:w-[320px] gap-4 shrink-0">
       
-      <div className="relative z-10 flex items-start justify-between mb-8">
-        <div className="flex flex-col gap-1">
-          <div className="flex items-center gap-2 mb-2">
-            <Code2 size={18} className="text-[#ffa116]" />
-            <h3 className="text-sm font-mono tracking-widest text-neutral-400 uppercase">LeetCode Stats</h3>
-          </div>
-          {stats && (
-            <div className="flex items-baseline gap-2">
-              <span className="text-4xl md:text-5xl font-light text-white tracking-tighter">{stats.totalSolved}</span>
-              <span className="text-xs font-mono text-[#ffa116]">Solved</span>
+      {/* --- RECTANGLE 1: Circular Progress (Screenshot 2 Match) --- */}
+      <div className="w-full bg-[#1c1c1e] border border-white/5 p-4 flex items-center justify-between rounded-2xl md:rounded-3xl shadow-lg relative overflow-hidden group hover:border-white/10 transition-colors duration-500">
+        
+        {loading ? (
+           <div className="w-full h-[140px] flex items-center justify-center">
+             <div className="w-6 h-6 border-2 border-[#ffa116] border-t-transparent rounded-full animate-spin"></div>
+           </div>
+        ) : stats ? (
+          <>
+            {/* Left Side: Doughnut Chart */}
+            <div className="relative w-28 h-28 flex items-center justify-center shrink-0">
+              <svg className="-rotate-90 w-full h-full" viewBox="0 0 100 100">
+                {/* Background Ring */}
+                <circle cx="50" cy="50" r={radius} fill="none" stroke="#2c2c2e" strokeWidth="6" />
+                
+                {/* Easy Ring */}
+                <circle cx="50" cy="50" r={radius} fill="none" stroke="#00b8a3" strokeWidth="6" strokeLinecap="round"
+                  strokeDasharray={getDashArray(stats.easySolved, stats.totalQuestions)}
+                  strokeDashoffset="0"
+                  className="transition-all duration-1000 ease-out"
+                />
+                
+                {/* Medium Ring */}
+                <circle cx="50" cy="50" r={radius} fill="none" stroke="#ffc01e" strokeWidth="6" strokeLinecap="round"
+                  strokeDasharray={getDashArray(stats.mediumSolved, stats.totalQuestions)}
+                  strokeDashoffset={getOffset(stats.easySolved, stats.totalQuestions)}
+                  className="transition-all duration-1000 ease-out delay-150"
+                />
+                
+                {/* Hard Ring */}
+                <circle cx="50" cy="50" r={radius} fill="none" stroke="#ff375f" strokeWidth="6" strokeLinecap="round"
+                  strokeDasharray={getDashArray(stats.hardSolved, stats.totalQuestions)}
+                  strokeDashoffset={getOffset(stats.easySolved + stats.mediumSolved, stats.totalQuestions)}
+                  className="transition-all duration-1000 ease-out delay-300"
+                />
+              </svg>
+              
+              {/* Inner Center Text */}
+              <div className="absolute flex flex-col items-center justify-center">
+                <div className="flex items-baseline gap-0.5">
+                  <span className="text-2xl text-white font-bold tracking-tighter">{stats.totalSolved}</span>
+                  <span className="text-[10px] text-neutral-400">/{stats.totalQuestions}</span>
+                </div>
+                <div className="flex items-center gap-1 mt-0.5">
+                  <Check size={10} className="text-[#00b8a3]" />
+                  <span className="text-[10px] text-white">Solved</span>
+                </div>
+              </div>
             </div>
-          )}
-        </div>
-        <a href={`https://leetcode.com/u/${username}/`} target="_blank" rel="noreferrer" className="p-2 bg-white/5 rounded-full text-neutral-400 hover:text-[#ffa116] hover:bg-[#ffa116]/10 transition-all">
-          <ArrowUpRight size={18} />
-        </a>
+
+            {/* Right Side: Stat Boxes */}
+            <div className="flex flex-col gap-1.5 w-[110px]">
+              {/* Easy Box */}
+              <div className="bg-[#2c2c2e] rounded-lg px-3 py-1.5 flex flex-col items-center justify-center">
+                <span className="text-[#00b8a3] text-[11px] font-medium mb-0.5">Easy</span>
+                <span className="text-white text-xs font-bold">{stats.easySolved}<span className="text-neutral-400 font-normal">/{stats.totalEasy}</span></span>
+              </div>
+              {/* Medium Box */}
+              <div className="bg-[#2c2c2e] rounded-lg px-3 py-1.5 flex flex-col items-center justify-center">
+                <span className="text-[#ffc01e] text-[11px] font-medium mb-0.5">Med.</span>
+                <span className="text-white text-xs font-bold">{stats.mediumSolved}<span className="text-neutral-400 font-normal">/{stats.totalMedium}</span></span>
+              </div>
+              {/* Hard Box */}
+              <div className="bg-[#2c2c2e] rounded-lg px-3 py-1.5 flex flex-col items-center justify-center">
+                <span className="text-[#ff375f] text-[11px] font-medium mb-0.5">Hard</span>
+                <span className="text-white text-xs font-bold">{stats.hardSolved}<span className="text-neutral-400 font-normal">/{stats.totalHard}</span></span>
+              </div>
+            </div>
+          </>
+        ) : (
+          <div className="w-full text-center text-red-400 text-xs font-mono py-10">{errorMsg}</div>
+        )}
       </div>
 
-      {loading ? (
-        <div className="flex-1 flex flex-col items-center justify-center py-10 gap-3">
-          <div className="w-6 h-6 border-2 border-[#ffa116] border-t-transparent rounded-full animate-spin"></div>
-          <span className="text-[10px] font-mono tracking-widest text-neutral-500 uppercase animate-pulse">Loading...</span>
-        </div>
-      ) : stats ? (
-        <div className="relative z-10 flex flex-col gap-5 w-full">
-          <StatBar label="Easy" solved={stats.easySolved} total={800} colorClass="bg-[#00b8a3]" />
-          <StatBar label="Medium" solved={stats.mediumSolved} total={1600} colorClass="bg-[#ffc01e]" />
-          <StatBar label="Hard" solved={stats.hardSolved} total={700} colorClass="bg-[#ff375f]" />
-          
-          <div className="w-full h-[1px] bg-white/10 my-2" />
-          
-          <div className="flex justify-between items-center w-full font-mono">
-             <span className="text-[10px] text-neutral-500 uppercase tracking-widest">Global Rank</span>
-             <span className="text-sm text-white font-medium">#{stats.ranking.toLocaleString()}</span>
+      {/* --- RECTANGLE 2: Badges (Screenshot 3 Match) --- */}
+      <div className="w-full h-[180px] bg-[#1c1c1e] border border-white/5 p-4 flex flex-col rounded-2xl md:rounded-3xl shadow-lg relative group hover:border-white/10 transition-colors duration-500 overflow-hidden">
+        
+        {loading ? (
+          <div className="w-full h-full flex items-center justify-center">
+             <div className="w-5 h-5 border-2 border-[#ffa116] border-t-transparent rounded-full animate-spin"></div>
           </div>
-        </div>
-      ) : (
-        <div className="flex-1 flex flex-col items-center justify-center py-10 text-neutral-500 font-mono text-[10px] uppercase tracking-widest gap-2">
-          <span className="text-red-400 text-center">{errorMsg}</span>
-        </div>
-      )}
+        ) : stats ? (
+          <>
+            {/* Top Header */}
+            <div className="flex justify-between items-start w-full relative z-10">
+              <div className="flex flex-col">
+                <span className="text-neutral-400 text-xs font-medium">Badges</span>
+                <span className="text-xl text-white font-bold leading-tight">{stats.badges?.length || 0}</span>
+              </div>
+              <ArrowRight size={18} className="text-neutral-500" />
+            </div>
+
+            {/* Middle Swipeable Badges */}
+            <div className="flex-1 w-full relative mt-2">
+               {stats.badges?.length > 0 ? (
+                 <div className="absolute inset-0 flex items-center overflow-x-auto snap-x snap-mandatory hide-scrollbar gap-4 px-2">
+                   {stats.badges.map((badge, idx) => {
+                     const iconUrl = badge.icon.startsWith("http") ? badge.icon : `https://leetcode.com${badge.icon}`;
+                     return (
+                       <div key={idx} className="shrink-0 snap-center flex flex-col items-center justify-center transform hover:scale-110 transition-transform">
+                         <img 
+                           src={iconUrl} 
+                           alt={badge.displayName} 
+                           className="w-14 h-14 md:w-16 md:h-16 object-contain drop-shadow-[0_0_10px_rgba(255,255,255,0.1)]" 
+                         />
+                       </div>
+                     );
+                   })}
+                 </div>
+               ) : (
+                 <div className="absolute inset-0 flex items-center justify-center text-neutral-600 text-xs">
+                   No Badges Yet
+                 </div>
+               )}
+            </div>
+
+            {/* Bottom Footer */}
+            <div className="text-neutral-500 text-[10px] mt-auto relative z-10">
+              Most Recent Badge
+            </div>
+          </>
+        ) : null}
+      </div>
+
     </div>
   );
 };
@@ -221,9 +306,9 @@ export const AchievementsSection = () => {
           </motion.h2>
         </div>
 
-        {/* The Magic Fix: flex-1 min-w-0 added here ensures it never breaks the layout */}
         <motion.div variants={itemVar} className="relative w-full max-w-[1600px] mx-auto flex flex-col xl:flex-row items-center xl:items-stretch gap-6 md:gap-8 px-4 md:px-8">
           
+          {/* Injecting our newly structured, vertically stacked component here */}
           <LeetCodeStatCard username={LEETCODE_USERNAME} />
 
           <div className="w-full flex-1 min-w-0 relative group rounded-2xl md:rounded-[2rem] overflow-hidden">
