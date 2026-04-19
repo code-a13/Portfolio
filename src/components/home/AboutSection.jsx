@@ -25,22 +25,16 @@ export const AboutSection = () => {
   const skills = ['Java', 'Spring Boot', 'Spring AI', 'React', 'Node.js', 'MongoDB', 'SQL', 'AWS'];
 
   return (
-    // THE FIX: Removed 'min-h-screen' and 'overflow-hidden'. 
-    // Now it flows naturally and allows the Layout component to scroll it smoothly!
     <section className="relative w-full text-white px-4 py-12 md:p-16 flex flex-col justify-center">
       
-      {/* THE FIX: Deleted the MagicBackground completely. The global Three.js background will shine through perfectly. */}
-
       <motion.div 
         variants={containerVar} 
         initial="hidden" 
         whileInView="visible" 
-        // Reduced amount to 0.1 so the animation triggers smoothly even if mobile screen is small
         viewport={{ once: true, amount: 0.1 }}
         className="relative z-10 max-w-4xl mx-auto w-full"
       >
         
-        {/* Synced with Hero H1 typography */}
         <motion.h2 
           variants={itemVar}
           className="text-5xl md:text-7xl font-medium mb-8 md:mb-12 border-b border-white/10 pb-6 tracking-tighter text-white"
@@ -48,15 +42,17 @@ export const AboutSection = () => {
           About <span className="font-serif italic text-neutral-400">Me.</span>
         </motion.h2>
         
-        {/* Changed gap for mobile and forced single column on small screens */}
         <div className="grid grid-cols-1 md:grid-cols-[1.5fr_1fr] gap-8 md:gap-12 items-start mt-4 md:mt-8">
           
           <motion.div variants={itemVar}>
-            {/* THE FIX: Text size scaled for mobile (text-sm) vs desktop (text-xl) */}
-            <p className="text-neutral-400 text-sm md:text-xl leading-relaxed font-light tracking-wide">
-              I am a passionate Computer Science student and aspiring Software Development Engineer. 
-              I focus on building clean, efficient, and scalable <span className="text-white font-medium">enterprise applications</span>. 
-              My journey involves mastering theoretical core concepts and leveraging powerful ecosystems like <span className="text-white font-medium">Spring and modern JavaScript</span> to solve real-world problems.
+            {/* THE FIX: Authentic, human-sounding text detailing the actual grind */}
+            <p className="text-neutral-400 text-sm md:text-xl leading-relaxed font-light tracking-wide space-y-4">
+              <span className="block mb-4">
+                I'm a second-year Computer Science student currently locked in on one clear objective: breaking into a  product company as a Software Development Engineer. 
+              </span>
+              <span className="block">
+                I don't just rely on university coursework. I spend my time deep-diving into <span className="text-white font-medium">Data Structures, Core CS principles, and System Design</span> from scratch. Whether I'm building heavy backend architectures with Java and Spring Boot or crafting fast interfaces with the MERN stack, my focus is always on putting in the hours, writing clean code, and actually understanding how systems work under the hood.
+              </span>
             </p>
           </motion.div>
 
@@ -72,15 +68,17 @@ export const AboutSection = () => {
               
               <div className="flex flex-wrap gap-2 md:gap-3">
                 {skills.map((skill) => (
-                  // THE FIX: Adjusted padding and font sizes specifically for mobile
-                  <div 
+                  // THE FIX: Added whileHover magnetic pop to make the skills feel creative and interactive
+                  <motion.div 
                     key={skill} 
-                    className="group flex items-center gap-2 px-3 md:px-5 py-2 md:py-2.5 border border-white/10 rounded-full bg-white/[0.02] backdrop-blur-md hover:bg-white/10 hover:border-white/30 transition-all duration-700 cursor-default"
+                    whileHover={{ scale: 1.1, y: -4, backgroundColor: "rgba(255,255,255,0.1)", borderColor: "rgba(255,255,255,0.3)" }}
+                    transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                    className="group flex items-center gap-2 px-3 md:px-5 py-2 md:py-2.5 border border-white/10 rounded-full bg-white/[0.02] backdrop-blur-md transition-colors duration-300 cursor-pointer"
                   >
-                    <span className="text-[10px] md:text-xs font-mono tracking-[0.1em] md:tracking-[0.15em] text-neutral-400 group-hover:text-white transition-colors duration-700 uppercase">
+                    <span className="text-[10px] md:text-xs font-mono tracking-[0.1em] md:tracking-[0.15em] text-neutral-400 group-hover:text-white transition-colors duration-300 uppercase">
                       {skill}
                     </span>
-                  </div>
+                  </motion.div>
                 ))}
               </div>
             </div>

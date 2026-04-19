@@ -30,14 +30,29 @@ const TechBadge = ({ icon, text }) => (
   </div>
 );
 
+// --- THE ROBUST ICON ARRAY ---
+const techStackIcons = [
+  "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/java/java-original.svg",
+  "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/spring/spring-original.svg",
+  "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/react/react-original.svg",
+  "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/nodejs/nodejs-original.svg",
+  "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/mongodb/mongodb-original.svg",
+  "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/mysql/mysql-original.svg",
+  "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/docker/docker-original.svg",
+  "https://www.vectorlogo.zone/logos/git-scm/git-scm-icon.svg", 
+  "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/github/github-original.svg", 
+  "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/vscode/vscode-original.svg",
+  "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/intellij/intellij-original.svg",
+  "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/tailwindcss/tailwindcss-original.svg",
+  "https://www.vectorlogo.zone/logos/getpostman/getpostman-icon.svg", 
+  "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/figma/figma-original.svg"
+];
+
 export const HeroSection = () => (
-  // THE FIX: Purely h-full so it strictly obeys the Layout boundaries without forcing an overflow scroll.
   <section className="relative w-full h-full flex flex-col items-center justify-center text-center px-4 md:px-0">
     
-    {/* THE FIX: Removed mt-[-5vh] because pure flex centering inside h-full handles it perfectly now */}
     <motion.div variants={containerVar} initial="hidden" animate="visible" className="z-10 w-full max-w-4xl relative flex flex-col items-center">
       
-      {/* THE FIX: mb-6 changed to mb-4 on mobile */}
       <motion.div variants={itemVar} className="inline-flex items-center gap-2 md:gap-3 px-3 md:px-4 py-1.5 md:py-2 rounded-full border border-white/20 bg-white/5 backdrop-blur-md mb-4 md:mb-8">
         <span className="relative flex h-1.5 w-1.5 md:h-2 md:w-2">
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
@@ -46,7 +61,6 @@ export const HeroSection = () => (
         <span className="text-[8px] md:text-[10px] font-mono font-medium text-white tracking-[0.15em] md:tracking-[0.2em] uppercase">Architecture • Running</span>
       </motion.div>
 
-      {/* THE FIX: mb-6 changed to mb-4 on mobile */}
       <motion.div variants={itemVar} className="space-y-2 md:space-y-4 mb-4 md:mb-8">
         <h1 className="text-5xl sm:text-6xl md:text-8xl lg:text-[7rem] font-medium tracking-tighter text-white leading-[1] md:leading-[0.9]">
           Software <br />
@@ -54,13 +68,37 @@ export const HeroSection = () => (
         </h1>
       </motion.div>
 
-      {/* THE FIX: mb-8 changed to mb-6, and max-w increased to 95% to save a line break */}
-      <motion.p variants={itemVar} className="text-neutral-400 text-sm md:text-xl leading-relaxed max-w-[95%] md:max-w-2xl font-light tracking-wide mb-6 md:mb-10 mx-auto">
-        Engineering high-performance backends and intelligent systems. 
-        Focusing on pure, scalable <span className="text-white font-medium">Java infrastructure</span> and modern web interfaces.
-      </motion.p>
+      <motion.div variants={itemVar} className="w-full max-w-[90vw] md:max-w-2xl mx-auto mb-6 md:mb-10 overflow-hidden" style={{ maskImage: "linear-gradient(to right, transparent, black 15%, black 85%, transparent)", WebkitMaskImage: "linear-gradient(to right, transparent, black 15%, black 85%, transparent)" }}>
+        <motion.div 
+          className="flex items-center w-max gap-4 md:gap-6 pr-4 md:pr-6"
+          animate={{ x: ["0%", "-50%"] }}
+          transition={{ ease: "linear", duration: 25, repeat: Infinity }}
+        >
+          {[...techStackIcons, ...techStackIcons].map((icon, index) => {
+            const isGitHub = icon.includes("github");
 
-      {/* THE FIX: mb-10 changed to mb-8 on mobile */}
+            return (
+              <div
+                key={index}
+                // THE FIX: Added 'aspect-square' and 'flex-none' to make the box indestructible
+                className={`relative w-10 h-10 md:w-12 md:h-12 aspect-square flex-none flex items-center justify-center p-2 md:p-2.5 rounded-xl border transition-all duration-500 cursor-pointer hover:-translate-y-1 ${
+                  isGitHub 
+                    ? "border-white/60 bg-white/10 shadow-[0_0_20px_rgba(255,255,255,0.4)] scale-110 mx-2" 
+                    : "border-white/10 bg-white/5 hover:border-white/30 hover:bg-white/10"                     
+                }`}
+              >
+                <img 
+                  src={icon} 
+                  alt="Tech Tool" 
+                  // THE FIX: Used max-w-full max-h-full instead of w-full h-full to stop the SVG from warping
+                  className={`max-w-full max-h-full object-contain drop-shadow-md ${isGitHub ? "invert" : ""}`} 
+                />
+              </div>
+            );
+          })}
+        </motion.div>
+      </motion.div>
+
       <motion.div variants={itemVar} className="flex flex-wrap justify-center gap-2 md:gap-3 mb-8 md:mb-12">
          <TechBadge icon={<Cpu size={14}/>} text="Java Core" />
          <TechBadge icon={<Database size={14}/>} text="System Design" />
