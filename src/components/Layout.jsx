@@ -7,15 +7,15 @@ import Sidebar from "./home/Sidebar";
 import { ThreeBackground } from "./home/ThreeBackground";
 
 // --- OPTIMIZED SPOTLIGHT GRID ---
-const SpotlightGrid = () => (
+const SpotlightGrid = ({ isLight }) => (
   <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-    <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:40px_40px]"></div>
+    <div className={`absolute inset-0 transition-colors duration-700 ${isLight ? 'bg-[linear-gradient(rgba(0,0,0,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,0.03)_1px,transparent_1px)]' : 'bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)]'} bg-[size:40px_40px]`}></div>
     <motion.div 
       animate={{ x: ["-20%", "120%", "-20%"], y: ["-20%", "120%", "-20%"] }}
       transition={{ duration: 45, repeat: Infinity, ease: "linear" }}
       className="absolute top-0 left-0 w-[600px] h-[600px] rounded-full will-change-transform"
       style={{
-        background: "radial-gradient(circle, rgba(255,255,255,0.06) 0%, transparent 70%)"
+        background: `radial-gradient(circle, ${isLight ? 'rgba(0,0,0,0.03)' : 'rgba(255,255,255,0.06)'} 0%, transparent 70%)`
       }}
     />
   </div>
@@ -39,7 +39,7 @@ const techStackIcons = [
   "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/figma/figma-original.svg"
 ];
 
-const SpinningTechRing = ({ y, totalItems, itemHeight }) => {
+const SpinningTechRing = ({ y, totalItems, itemHeight, isLight }) => {
   const maxScroll = -(totalItems - 1) * itemHeight; // Calculate max scroll distance (-320px)
   const midScroll = maxScroll / 2;
 
@@ -60,13 +60,11 @@ const SpinningTechRing = ({ y, totalItems, itemHeight }) => {
         transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
         className="relative flex items-center justify-center w-0 h-0"
       >
-        {/* Outer Circle: Increased Size! */}
-        <div className="absolute top-1/2 left-1/2 w-[min(95vmin,800px)] h-[min(95vmin,800px)] rounded-full border border-white/10 border-dashed -translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
-        
-        {/* Inner Circle: Increased Size! */}
-        <div className="absolute top-1/2 left-1/2 w-[min(60vmin,450px)] h-[min(60vmin,450px)] rounded-full border border-white/20 -translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
+        {/* Dynamic Borders based on Theme */}
+        <div className={`absolute top-1/2 left-1/2 w-[min(95vmin,800px)] h-[min(95vmin,800px)] rounded-full border ${isLight ? 'border-black/10' : 'border-white/10'} border-dashed -translate-x-1/2 -translate-y-1/2 pointer-events-none transition-colors duration-700`}></div>
+        <div className={`absolute top-1/2 left-1/2 w-[min(60vmin,450px)] h-[min(60vmin,450px)] rounded-full border ${isLight ? 'border-black/20' : 'border-white/20'} -translate-x-1/2 -translate-y-1/2 pointer-events-none transition-colors duration-700`}></div>
 
-        {/* The Wrapper for Logos (Mathematically centered exactly between the two rings) */}
+        {/* The Wrapper for Logos */}
         <div className="absolute top-1/2 left-1/2 w-[min(77.5vmin,625px)] h-[min(77.5vmin,625px)] -translate-x-1/2 -translate-y-1/2 pointer-events-none">
           {techStackIcons.map((logo, index) => {
             const angle = (360 / techStackIcons.length) * index;
@@ -78,17 +76,18 @@ const SpinningTechRing = ({ y, totalItems, itemHeight }) => {
               >
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 md:w-14 md:h-14 pointer-events-auto">
                   
-                  {/* THE COUNTER-SPIN FIX: Keeps the icons perfectly upright while the wheel turns! */}
                   <motion.div 
                     animate={{ rotate: [-angle, -360 - angle] }}
                     transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
                     whileHover={{ scale: 1.4, opacity: 1, zIndex: 50 }}
-                    className="w-full h-full bg-[#0a0a0a] rounded-full p-2 md:p-3 border border-white/20 shadow-[0_0_20px_rgba(255,255,255,0.2)] flex items-center justify-center cursor-crosshair transition-colors hover:bg-white/10"
+                    // Dynamic Colors for the Bubbles
+                    className={`w-full h-full rounded-full p-2 md:p-3 border flex items-center justify-center cursor-crosshair transition-colors duration-700 ${isLight ? 'bg-white border-black/10 shadow-[0_0_20px_rgba(0,0,0,0.05)] hover:bg-black/5' : 'bg-[#0a0a0a] border-white/20 shadow-[0_0_20px_rgba(255,255,255,0.2)] hover:bg-white/10'}`}
                   >
                     <img 
                       src={logo} 
                       alt="tech tool" 
-                      className={`w-full h-full object-contain ${logo.includes('github') ? 'invert' : ''}`} 
+                      // Invert Github icon only in dark mode
+                      className={`w-full h-full object-contain transition-all duration-700 ${logo.includes('github') ? (isLight ? '' : 'invert') : ''}`} 
                     />
                   </motion.div>
 
@@ -173,6 +172,8 @@ const Layout = () => {
   const y = useMotionValue(0);
   const [activeIndex, setActiveIndex] = useState(0);
 
+  const isLight = location.pathname === '/about' || location.pathname === '/projects';
+
   useMouseScrollNavigation();
 
   // Keep mouse tracking logic
@@ -197,16 +198,17 @@ const Layout = () => {
   }, [location.pathname, y]);
 
   return (
-    <div onMouseMove={handleMouseMove} className="fixed inset-0 flex h-[100dvh] w-screen bg-black text-white overflow-hidden font-sans selection:bg-white selection:text-black">
+    <div onMouseMove={handleMouseMove} className={`fixed inset-0 flex h-[100dvh] w-screen overflow-hidden font-sans transition-colors duration-700 ${isLight ? 'bg-[#fafafa] text-black selection:bg-black selection:text-white' : 'bg-black text-white selection:bg-white selection:text-black'}`}>
       
       {/* Background & 3D Layer */}
       <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
-        <ThreeBackground />
-        <SpotlightGrid />
+        {/* Render stars only in dark mode, otherwise leave clean white space */}
+        {!isLight && <ThreeBackground />}
+        <SpotlightGrid isLight={isLight} />
       </div>
 
-      {/* THE NEW SPINNING RING (Outside the pointer-events-none div so it's interactive) */}
-      <SpinningTechRing y={y} totalItems={navItems.length} itemHeight={ITEM_HEIGHT} />
+      {/* Spinning Ring gets the isLight prop now */}
+      <SpinningTechRing y={y} totalItems={navItems.length} itemHeight={ITEM_HEIGHT} isLight={isLight} />
 
       {/* Sidebar Navigation */}
       <Sidebar items={navItems} activeIndex={activeIndex} />
@@ -217,10 +219,11 @@ const Layout = () => {
         {/* Big Background Tracking Text */}
         <div className="absolute right-[-5%] bottom-[-5%] select-none pointer-events-none overflow-hidden z-0">
             <motion.div style={{ x: moveX, y: moveY }} className="flex flex-col items-end will-change-transform">
-                <motion.h1 key={activeIndex} initial={{ y: 50, opacity: 0, skewX: -10 }} animate={{ y: 0, opacity: 0.03, skewX: 0 }} transition={{ duration: 1.2, ease: "easeOut" }} className="text-[20vw] font-black text-white leading-none whitespace-nowrap tracking-tighter uppercase">
+                <motion.h1 key={activeIndex} initial={{ y: 50, opacity: 0, skewX: -10 }} animate={{ y: 0, opacity: 0.03, skewX: 0 }} transition={{ duration: 1.2, ease: "easeOut" }} className="text-[20vw] font-black leading-none whitespace-nowrap tracking-tighter uppercase">
                     {navItems[activeIndex].name}
                 </motion.h1>
-                <motion.h1 key={`outline-${activeIndex}`} initial={{ y: 60, opacity: 0 }} animate={{ y: 0, opacity: 0.01 }} transition={{ duration: 1.5, delay: 0.1 }} className="text-[18vw] font-black leading-none whitespace-nowrap tracking-tighter uppercase" style={{ WebkitTextStroke: "1px rgba(255,255,255,0.5)", color: "transparent" }}>
+                {/* Outline stroke changes based on theme */}
+                <motion.h1 key={`outline-${activeIndex}`} initial={{ y: 60, opacity: 0 }} animate={{ y: 0, opacity: 0.01 }} transition={{ duration: 1.5, delay: 0.1 }} className="text-[18vw] font-black leading-none whitespace-nowrap tracking-tighter uppercase" style={{ WebkitTextStroke: isLight ? "1px rgba(0,0,0,0.3)" : "1px rgba(255,255,255,0.5)", color: "transparent" }}>
                     {navItems[activeIndex].name}
                 </motion.h1>
             </motion.div>
@@ -228,8 +231,8 @@ const Layout = () => {
 
         {/* Top Left Tagline */}
         <div className="absolute top-8 left-6 md:left-[120px] flex items-center gap-4 z-20 pointer-events-none">
-           <div className="w-12 h-[1px] bg-white/30"></div>
-           <span className="text-neutral-400 font-mono text-xs tracking-[0.4em] uppercase font-medium">
+           <div className={`w-12 h-[1px] transition-colors duration-700 ${isLight ? 'bg-black/20' : 'bg-white/30'}`}></div>
+           <span className={`font-mono text-xs tracking-[0.4em] uppercase font-medium transition-colors duration-700 ${isLight ? 'text-neutral-500' : 'text-neutral-400'}`}>
              {navItems[activeIndex].tagline}
            </span>
         </div>

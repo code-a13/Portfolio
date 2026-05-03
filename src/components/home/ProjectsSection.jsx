@@ -1,24 +1,28 @@
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowUpRight, Github, X, Terminal, Command, GitMerge } from "lucide-react";
+import { ArrowUpRight, Github, X, Terminal } from "lucide-react";
 
 import mediflowImg from "../../assets/images/medi.png";
 import alumniImg from "../../assets/images/ac.png";
 import momentumImg from "../../assets/images/momentum.png";
 import multiMartImg from "../../assets/images/multimart.png"; 
 
-// --- ANIMATION VARIANTS FOR STAGGERED LIST ---
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { staggerChildren: 0.15, delayChildren: 0.2 }
-  }
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, x: -20 },
-  visible: { opacity: 1, x: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
+// --- HELPER FUNCTION: Maps your project tags to beautiful tech logos ---
+const getTechIcon = (tag) => {
+  const t = tag.toLowerCase();
+  if (t.includes("react") || t.includes("context")) return "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/react/react-original.svg";
+  if (t.includes("fastapi")) return "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/fastapi/fastapi-original.svg";
+  if (t.includes("tailwind")) return "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/tailwindcss/tailwindcss-original.svg";
+  if (t.includes("mern") || t.includes("mongo")) return "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/mongodb/mongodb-original.svg";
+  if (t.includes("socket")) return "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/socketio/socketio-original.svg";
+  if (t.includes("redux")) return "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/redux/redux-original.svg";
+  if (t.includes("vanilla js") || t.includes("javascript")) return "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/javascript/javascript-original.svg";
+  if (t.includes("html5")) return "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/html5/html5-original.svg";
+  if (t.includes("css3")) return "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/css3/css3-original.svg";
+  if (t.includes("ai")) return "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/python/python-original.svg";
+  if (t.includes("jwt")) return "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/nodejs/nodejs-original.svg";
+  
+  return "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/bash/bash-original.svg"; // Fallback icon
 };
 
 export const ProjectsSection = () => {
@@ -44,12 +48,6 @@ export const ProjectsSection = () => {
       title: "MediFlow SmartPad",
       description: "An AI-powered clinical assistant utilizing RAG. Features advanced prescription safety analysis and seamless data retrieval.",
       tags: ["React", "FastAPI", "AI Models", "Tailwind"],
-      systemDesign: [
-        "Client: React UI for real-time interaction",
-        "API Gateway: FastAPI handling concurrent requests",
-        "AI Engine: RAG Architecture with Vector DB",
-        "Security: Encrypted patient data transmission"
-      ],
       link: "https://github.com/code-a13/MediFlow", 
       github: "https://github.com/code-a13/MediFlow",
       type: "AI Healthcare",
@@ -59,12 +57,6 @@ export const ProjectsSection = () => {
       title: "AlumniConnect",
       description: "A full-stack ecosystem bridging students and alumni with real-time socket chat, event management, and networking.",
       tags: ["MERN", "Socket.io", "Redux", "JWT"],
-      systemDesign: [
-        "Frontend: React with Redux for state management",
-        "Backend: Node/Express micro-services",
-        "Database: MongoDB with Mongoose aggregation",
-        "Real-time: Socket.io for bidirectional chat"
-      ],
       link: "https://alumniconnect.me",
       github: "https://github.com/code-a13/AlumniConnect.git",
       type: "Full Stack Platform",
@@ -74,12 +66,6 @@ export const ProjectsSection = () => {
       title: "Momentum",
       description: "A lightweight, dependency-free productivity suite built purely on the DOM for maximum performance.",
       tags: ["Vanilla JS", "HTML5", "CSS3"],
-      systemDesign: [
-        "Core: Vanilla JavaScript ES6+",
-        "Storage: LocalStorage API for persistence",
-        "Rendering: Direct DOM manipulation (Zero libraries)",
-        "Styling: Pure CSS3 with Flexbox/Grid"
-      ],
       link: "https://momentum13.vercel.app/",
       github: "https://github.com/code-a13/MOMENTUM-JS_LAB_PROJECT.git",
       type: "Productivity App",
@@ -89,12 +75,6 @@ export const ProjectsSection = () => {
       title: "MultiMart",
       description: "A comprehensive multi-store e-commerce platform delivering a seamless shopping and vendor management experience.",
       tags: ["React", "Tailwind", "Context API"],
-      systemDesign: [
-        "Architecture: Component-based modular design",
-        "State: React Context API for global cart state",
-        "Styling: Tailwind CSS for responsive utility classes",
-        "Routing: React Router for SPA navigation"
-      ],
       link: "https://reactproject201.vercel.app",
       github: "https://github.com/code-a13/MULTI_MART_REACT_PROJECT.git",
       type: "E-Commerce Platform",
@@ -103,7 +83,7 @@ export const ProjectsSection = () => {
   ];
 
   return (
-    <section className="relative w-full h-full flex flex-col justify-center bg-transparent text-white overflow-hidden py-2 md:py-16">
+    <section className="relative w-full h-full flex flex-col justify-center bg-transparent text-black overflow-hidden py-2 md:py-16">
       
       <style>
         {`
@@ -112,8 +92,8 @@ export const ProjectsSection = () => {
           
           .custom-scroll::-webkit-scrollbar { width: 4px; }
           .custom-scroll::-webkit-scrollbar-track { background: transparent; }
-          .custom-scroll::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 10px; }
-          .custom-scroll::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.5); }
+          .custom-scroll::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.2); border-radius: 10px; }
+          .custom-scroll::-webkit-scrollbar-thumb:hover { background: rgba(0, 0, 0, 0.5); }
         `}
       </style>
 
@@ -124,15 +104,14 @@ export const ProjectsSection = () => {
           viewport={{ once: true }}
           className="flex flex-col items-end w-full pt-2 md:pt-12"
         >
-           <h2 className="text-4xl sm:text-5xl md:text-7xl font-medium text-white tracking-tighter uppercase text-right leading-none">
+           <h2 className="text-4xl sm:text-5xl md:text-7xl font-medium text-black tracking-tighter uppercase text-right leading-none">
              Projects <span className="font-serif italic text-neutral-500">.</span>
            </h2>
-           <div className="h-[1px] w-full max-w-[200px] md:max-w-md bg-white/20 mt-3 md:mt-8"></div>
+           <div className="h-[1px] w-full max-w-[200px] md:max-w-md bg-black/20 mt-3 md:mt-8"></div>
         </motion.div>
       </div>
 
       <div className="relative w-full overflow-hidden flex group">
-        {/* MOBILE FIX: Added snap-x and snap-mandatory for smooth mobile carousel feel */}
         <div className="flex gap-4 md:gap-8 w-full overflow-x-auto hide-scrollbar px-6 md:px-8 pb-4 md:pb-8 snap-x snap-mandatory">
           {projects.map((project, i) => (
             <FlipCard 
@@ -147,101 +126,93 @@ export const ProjectsSection = () => {
 
       <AnimatePresence>
         {selectedProject && (
+          // THE BOX FIX: inset-[-100%] forces the overlay to be 300% the size of the screen, escaping all containers!
           <motion.div 
             initial={{ opacity: 0, backdropFilter: "blur(0px)" }}
             animate={{ opacity: 1, backdropFilter: "blur(16px)" }}
             exit={{ opacity: 0, backdropFilter: "blur(0px)" }}
             transition={{ duration: 0.4 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 md:p-8 bg-black/80"
+            className="fixed inset-[-100%] z-50 flex items-center justify-center p-4 sm:p-8 bg-white/80"
           >
+            {/* THE CIRCLE FIX: aspect-square and shrink-0 force a perfect circle even on tiny phones */}
             <motion.div 
-              initial={{ scale: 0.95, opacity: 0, y: 20 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.95, opacity: 0, y: 20 }}
+              initial={{ scale: 0.8, opacity: 0, rotate: 45 }}
+              animate={{ scale: 1, opacity: 1, rotate: 0 }}
+              exit={{ scale: 0.8, opacity: 0, rotate: -45 }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="relative w-full max-w-6xl max-h-[90vh] md:h-[80vh] bg-[#050505] border border-white/20 flex flex-col md:flex-row overflow-hidden shadow-[0_0_80px_rgba(255,255,255,0.05)] rounded-lg md:rounded-none"
+              className="relative w-[90vw] max-w-[550px] aspect-square shrink-0 bg-white/95 backdrop-blur-2xl border border-black/10 shadow-[0_0_100px_rgba(0,0,0,0.15)] rounded-full grid grid-cols-2 grid-rows-2 overflow-hidden"
             >
-              <div className="absolute top-0 left-0 w-full h-[2px] bg-white z-50"></div>
+              
+              {/* Central Aesthetic Hub */}
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 bg-white border border-black/10 rounded-full z-20 flex items-center justify-center shadow-[0_0_30px_rgba(0,0,0,0.1)]">
+                <Terminal size={20} className="text-black opacity-50" />
+              </div>
 
-              <button 
-                onClick={() => setSelectedProject(null)}
-                className="absolute top-2 right-2 md:top-4 md:right-4 z-50 p-2 text-neutral-400 hover:text-black hover:bg-white transition-all duration-300 border border-transparent hover:border-white rounded-full md:rounded-none bg-black/50 md:bg-transparent"
+              {/* QUADRANT 1 - ORBITAL LAYOUT */}
+              <div className="relative border-r border-b border-black/10 hover:bg-black/[0.02] transition-colors group min-h-0 min-w-0 overflow-hidden">
+                 {/* Invisible anchor pinned exactly to the mathematical center of the circle */}
+                 <div className="absolute bottom-0 right-0 w-0 h-0">
+                   {selectedProject.tags.map((tag, idx) => {
+                     const total = selectedProject.tags.length;
+                     
+                     // THE SPACING FIX: Spread angles from 15 to 75 degrees for wide, even spacing
+                     const startAngle = 15;
+                     const endAngle = 75;
+                     const angleRange = endAngle - startAngle;
+                     const angle = total === 1 ? 45 : startAngle + (idx * (angleRange / (total - 1)));
+                     
+                     return (
+                       <div 
+                         key={idx} 
+                         title={tag}
+                         className="absolute flex items-center justify-center"
+                         style={{
+                           // THE RADIUS FIX: Pushes icons perfectly towards the outer edge based on screen size
+                           transform: `rotate(-${angle}deg) translateY(calc(-1 * clamp(80px, 29vw, 178px))) rotate(${angle}deg)`,
+                         }}
+                       >
+                         {/* The actual icon, perfectly centered at its orbital coordinate */}
+                         <div className="absolute -translate-x-1/2 -translate-y-1/2 w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-white rounded-full p-1.5 sm:p-2 border border-black/10 shadow-[0_4px_15px_rgba(0,0,0,0.06)] flex items-center justify-center hover:scale-125 transition-all duration-300 cursor-help">
+                           <img src={getTechIcon(tag)} alt={tag} className="w-full h-full object-contain" />
+                         </div>
+                       </div>
+                     );
+                   })}
+                 </div>
+              </div>
+
+              {/* QUADRANT 2: Source Code */}
+              <a 
+                href={selectedProject.github} 
+                target="_blank" 
+                rel="noreferrer" 
+                className="flex flex-col items-center justify-center p-4 sm:p-8 md:p-16 border-b border-black/10 hover:bg-black/[0.02] transition-colors group text-neutral-500 hover:text-black relative min-h-0 min-w-0 overflow-hidden"
               >
-                <X size={20} className="md:w-6 md:h-6" />
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,0,0,0.03)_0%,transparent_70%)] opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <Github size={28} className="mb-2 md:mb-4 md:w-12 md:h-12 group-hover:scale-125 transition-transform duration-500" />
+                <span className="text-[8px] md:text-xs font-mono uppercase tracking-widest relative z-10 text-center">Source Code</span>
+              </a>
+
+              {/* QUADRANT 3: Live Link */}
+              <a 
+                href={selectedProject.link} 
+                target="_blank" 
+                rel="noreferrer" 
+                className="flex flex-col items-center justify-center p-4 sm:p-8 md:p-16 border-r border-black/10 bg-black text-white hover:bg-neutral-800 transition-colors duration-500 group relative min-h-0 min-w-0 overflow-hidden"
+              >
+                <ArrowUpRight size={28} className="mb-2 md:mb-4 md:w-12 md:h-12 group-hover:scale-125 transition-transform duration-500" />
+                <span className="text-[8px] md:text-xs font-mono uppercase tracking-widest relative z-10 text-center">Live Link</span>
+              </a>
+
+              {/* QUADRANT 4: Close Button */}
+              <button 
+                onClick={() => setSelectedProject(null)} 
+                className="flex flex-col items-center justify-center p-4 sm:p-8 md:p-16 hover:bg-red-500/10 hover:text-red-600 transition-colors group text-neutral-500 relative min-h-0 min-w-0 overflow-hidden"
+              >
+                <X size={28} className="mb-2 md:mb-4 md:w-12 md:h-12 group-hover:scale-125 group-hover:rotate-90 transition-transform duration-500" />
+                <span className="text-[8px] md:text-xs font-mono uppercase tracking-widest relative z-10 text-center">Close</span>
               </button>
 
-              <div className="w-full h-[30vh] md:w-3/5 md:h-full relative bg-black group/img order-1 md:order-2 border-b md:border-b-0 md:border-l border-white/10">
-                <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:30px_30px] opacity-20 pointer-events-none z-10"></div>
-                <img 
-                  src={selectedProject.image} 
-                  alt={selectedProject.title} 
-                  className="w-full h-full object-cover object-center grayscale opacity-60 group-hover/img:grayscale-0 group-hover/img:opacity-100 transition-all duration-700"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-transparent to-[#050505]/50 pointer-events-none"></div>
-              </div>
-
-              <div className="w-full h-[60vh] md:w-2/5 md:h-full flex flex-col p-5 md:p-10 relative bg-[#0a0a0a] z-10 order-2 md:order-1 overflow-y-auto custom-scroll">
-                <div className="flex-grow">
-                  <div className="flex items-center gap-3 text-neutral-400 mb-6 border-b border-white/10 pb-4">
-                    <Terminal size={16} />
-                    <span className="text-[10px] tracking-[0.3em] font-mono uppercase">System_Override</span>
-                  </div>
-
-                  <h3 className="text-3xl md:text-5xl font-bold text-white tracking-tighter leading-none mb-2">
-                    {selectedProject.title}
-                  </h3>
-                  <span className="text-[10px] md:text-xs font-mono text-neutral-500 uppercase tracking-widest block mb-6">
-                    // {selectedProject.type}
-                  </span>
-
-                  <div className="space-y-6">
-                    <div className="flex flex-wrap gap-2">
-                      {selectedProject.tags.map((tag, idx) => (
-                        <span key={idx} className="px-2 py-1 md:px-3 md:py-1.5 border border-white/20 text-[10px] md:text-xs font-mono text-neutral-300 uppercase hover:bg-white hover:text-black transition-colors duration-300 cursor-default">
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-
-                    <div className="bg-white/[0.02] border border-white/10 p-4 rounded-sm">
-                      <div className="flex items-center gap-2 text-white mb-3">
-                        <GitMerge size={14} />
-                        <span className="text-[10px] uppercase font-mono tracking-widest">System_Architecture</span>
-                      </div>
-                      <motion.ul variants={containerVariants} initial="hidden" animate="visible" className="space-y-2">
-                        {selectedProject.systemDesign.map((step, idx) => (
-                          <motion.li key={idx} variants={itemVariants} className="text-xs text-neutral-400 font-mono leading-relaxed flex items-start gap-2">
-                            <span className="text-white mt-0.5">{">"}</span> {step}
-                          </motion.li>
-                        ))}
-                      </motion.ul>
-                    </div>
-
-                    <div>
-                      <span className="text-[10px] text-neutral-500 uppercase font-mono tracking-widest block mb-2 mt-4">
-                        [ Core_Description ]
-                      </span>
-                      <p className="text-xs md:text-sm text-neutral-400 leading-relaxed font-light">
-                        {selectedProject.description}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mt-8 space-y-2 font-mono text-[10px] md:text-xs uppercase tracking-widest shrink-0">
-                  <a href={selectedProject.github} target="_blank" rel="noreferrer" 
-                    className="flex items-center justify-between w-full p-3 md:p-4 border border-white/20 text-white hover:bg-white hover:text-black transition-all duration-300 group">
-                    <span className="flex items-center gap-3"><Github size={14} /> Source_Code</span>
-                    <Command size={12} className="opacity-0 group-hover:opacity-100 transition-opacity" />
-                  </a>
-                  <a href={selectedProject.link} target="_blank" rel="noreferrer" 
-                    className="flex items-center justify-between w-full p-3 md:p-4 bg-white text-black hover:bg-transparent hover:text-white border border-white transition-all duration-300 group">
-                    <span className="flex items-center gap-3"><ArrowUpRight size={14} /> Initialize_App</span>
-                    <Command size={12} className="opacity-0 group-hover:opacity-100 transition-opacity" />
-                  </a>
-                </div>
-
-              </div>
             </motion.div>
           </motion.div>
         )}
@@ -255,14 +226,12 @@ const FlipCard = ({ project, index, onClick }) => {
   const [isFlipped, setIsFlipped] = useState(false);
   const cardRef = useRef(null);
 
-  // GAMIFIED LIGHTING FIX: Calculate mouse position for the glow effect
   const handleMouseMove = (e) => {
     if (!cardRef.current) return;
     const rect = cardRef.current.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
     
-    // Set CSS variables dynamically without causing React re-renders!
     cardRef.current.style.setProperty("--mouse-x", `${x}px`);
     cardRef.current.style.setProperty("--mouse-y", `${y}px`);
   };
@@ -277,55 +246,57 @@ const FlipCard = ({ project, index, onClick }) => {
       onClick={onClick}
     >
       <motion.div
-        className="w-full h-full relative [transform-style:preserve-3d] group/inner rounded-3xl"
+        className="w-full h-full relative [transform-style:preserve-3d] group/inner rounded-3xl shadow-sm"
         animate={{ rotateY: isFlipped ? 180 : 0 }}
         transition={{ duration: 0.6, type: "spring", stiffness: 200, damping: 20 }}
       >
-        {/* LIGHT GLOW OVERLAY - Tracks the cursor using CSS variables */}
         <div className="absolute inset-0 z-20 pointer-events-none rounded-3xl opacity-0 group-hover/card:opacity-100 transition-opacity duration-500"
              style={{
-               background: `radial-gradient(600px circle at var(--mouse-x) var(--mouse-y), rgba(255,255,255,0.06), transparent 40%)`
+               background: `radial-gradient(600px circle at var(--mouse-x) var(--mouse-y), rgba(0,0,0,0.04), transparent 40%)`
              }}
         />
 
-        {/* FRONT FACE */}
-        <div className="absolute inset-0 w-full h-full bg-white/[0.02] backdrop-blur-md border border-white/10 rounded-3xl p-5 md:p-10 flex flex-col justify-between [backface-visibility:hidden]">
-           <div className="absolute inset-0 bg-gradient-to-b from-white/[0.05] to-transparent rounded-3xl pointer-events-none" />
+        <div className="absolute inset-0 w-full h-full bg-transparent backdrop-blur-md border border-black/10 rounded-3xl p-5 md:p-10 flex flex-col justify-between [backface-visibility:hidden]">
+           <div className="absolute inset-0 bg-gradient-to-b from-black/[0.02] to-transparent rounded-3xl pointer-events-none" />
+           
            <div className="space-y-2 md:space-y-4 relative z-10">
               <span className="text-[10px] md:text-xs font-mono text-neutral-500 tracking-[0.2em] uppercase">{project.type}</span>
-              <h3 className="text-xl md:text-3xl font-medium text-white tracking-tight leading-tight line-clamp-2">{project.title}</h3>
-              <p className="text-neutral-400 text-xs md:text-sm leading-relaxed font-light line-clamp-3 md:line-clamp-4">
+              <h3 className="text-xl md:text-3xl font-medium text-black tracking-tight leading-tight line-clamp-2">{project.title}</h3>
+              <p className="text-neutral-600 text-xs md:text-sm leading-relaxed font-light line-clamp-3 md:line-clamp-4">
                 {project.description}
               </p>
            </div>
+           
            <div className="flex flex-wrap gap-2 mt-3 md:mt-6 relative z-10">
              {project.tags.map((tag, idx) => (
-               <span key={idx} className="px-3 py-1.5 text-[8px] md:text-[10px] font-mono tracking-widest text-neutral-300 border border-white/10 rounded-full uppercase bg-white/5">
+               <span key={idx} className="px-3 py-1.5 text-[8px] md:text-[10px] font-mono tracking-widest text-neutral-500 border border-black/10 rounded-full uppercase bg-transparent">
                  {tag}
                </span>
              ))}
            </div>
-           <div className="absolute top-5 right-5 md:top-8 md:right-8 text-white/20 group-hover/inner:text-white transition-colors duration-300 flex items-center gap-3 z-10">
+
+           <div className="absolute top-5 right-5 md:top-8 md:right-8 text-black/30 group-hover/inner:text-black transition-colors duration-300 flex items-center gap-3 z-10">
               <span className="text-[10px] font-mono uppercase tracking-widest hidden md:block">Select</span>
               <ArrowUpRight size={20} className="md:w-6 md:h-6" />
            </div>
         </div>
 
-        {/* BACK FACE */}
-        <div className="absolute inset-0 w-full h-full bg-[#0a0a0a] rounded-3xl overflow-hidden border border-white/20 [backface-visibility:hidden] [transform:rotateY(180deg)] flex flex-col group/back">
-           <div className="relative w-full h-full bg-neutral-900 flex items-center justify-center p-3 md:p-4">
+        <div className="absolute inset-0 w-full h-full bg-white rounded-3xl overflow-hidden border border-black/10 [backface-visibility:hidden] [transform:rotateY(180deg)] flex flex-col group/back shadow-md">
+           <div className="relative w-full h-full bg-neutral-100 flex items-center justify-center p-3 md:p-4">
                <img 
                  src={project.image} 
                  alt={project.title}
-                 className="w-full h-full object-contain rounded-xl opacity-80 group-hover/back:opacity-100 group-hover/back:scale-105 transition-all duration-700 pointer-events-none"
+                 className="w-full h-full object-contain rounded-xl opacity-90 group-hover/back:opacity-100 group-hover/back:scale-105 transition-all duration-700 pointer-events-none"
                />
            </div>
-           <div className="absolute inset-0 bg-black/80 flex items-center justify-center opacity-0 group-hover/back:opacity-100 transition-opacity duration-500 backdrop-blur-sm">
-              <div className="px-6 md:px-8 py-3 bg-white text-black text-[10px] md:text-xs font-bold tracking-[0.15em] uppercase rounded-full flex items-center gap-2 hover:scale-105 transition-transform duration-300">
-                View System Specs <ArrowUpRight size={16} />
+           
+           <div className="absolute inset-0 bg-white/80 flex items-center justify-center opacity-0 group-hover/back:opacity-100 transition-opacity duration-500 backdrop-blur-sm">
+              <div className="px-6 md:px-8 py-3 bg-black text-white text-[10px] md:text-xs font-bold tracking-[0.15em] uppercase rounded-full flex items-center gap-2 hover:scale-105 transition-transform duration-300 shadow-xl">
+                Open Dashboard <ArrowUpRight size={16} />
               </div>
            </div>
         </div>
+
       </motion.div>
     </div>
   );
