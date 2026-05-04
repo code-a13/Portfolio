@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Analytics } from '@vercel/analytics/react'; // 1. Import the Analytics component
 import Layout from './components/Layout';
-
 
 import { 
   HeroSection, 
@@ -14,7 +14,7 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/* Everything inside Layout gets the Sidebar */}
+       
         <Route element={<Layout />}>
           <Route path="/" element={<HeroSection />} />
           <Route path="/projects" element={<ProjectsSection />} />
@@ -24,6 +24,7 @@ function App() {
         </Route>
       </Routes>
       
+      <Analytics /> 
     </Router>
   );
 }
